@@ -24,8 +24,8 @@ signals:
 
 
 public slots:
-    void saveDataAs();
-    void loadDataIn();
+    void exportData();
+    void importData();
     void readTextFile(QFile * file);
     void writeTextFile(QFile *file);
     void readXMLFile(QFile * file);
@@ -34,14 +34,14 @@ public slots:
     void writeJSONFile(QFile* file);
     MarsError  errorInstance(QString msg, MarsErrorLevel level);
     void onCommandLineDataReady();
-    bool createCommandLine(int number,bool view_only=false,int maxIBufferSize=500, int maxOBufferSize=1000);
+    bool createCommandLine(int number,bool viewOnly=false,int maxIBufferSize=500, int maxOBufferSize=1000);
     void createToolBar();
 private:
     QList<MarsCommandLine*> commandLines;
     QGridLayout * layout;
     QToolBar * toolBar;
-    QAction * saveAsAction;
-    QAction * loadInAction;
+    QAction * exportDataAction;
+    QAction * importDataAction;
 
 };
 

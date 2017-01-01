@@ -7,7 +7,12 @@
 #include <QList>
 #include <QToolBar>
 
-MarsConsole::MarsConsole(QWidget *parent,bool view_only,int maxIBufferSize,int maxOBufferSize) : QWidget(parent)
+/**
+ *@Desc: init gridlayout ,tool bar and command line
+ *@Args: QWidget *(parent ), bool(view only mode), int (max input buffer size), int(max output buffer size)
+ *@Returns: None
+ */
+MarsConsole::MarsConsole(QWidget *parent,bool viewOnly,int maxIBufferSize,int maxOBufferSize) : QWidget(parent)
 {    
 
 
@@ -15,13 +20,19 @@ MarsConsole::MarsConsole(QWidget *parent,bool view_only,int maxIBufferSize,int m
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
     this->setLayout(layout);
+    // note!!!: createToolBar() must be called before createCommandLine(*);
     createToolBar();
-    createCommandLine(1,view_only,maxIBufferSize,maxOBufferSize);
-
+    createCommandLine(1,viewOnly,maxIBufferSize,maxOBufferSize);
 
 }
 
 
+/**
+ *@Desc: create tool bar
+ *@Args: None
+ *@Returns: None
+ *
+ */
 void MarsConsole::createToolBar()
 {
     toolBar = new QToolBar("hello",this);
@@ -37,13 +48,22 @@ void MarsConsole::createToolBar()
     toolBar->setFixedHeight(25);
     toolBar->setContentsMargins(0,0,0,0);
     toolBar->setOrientation(Qt::Horizontal);
-    saveAsAction = new QAction(QIcon(":/icon/export"),tr("导出数据"),this);
-    loadInAction = new QAction(QIcon(":/icon/import"),tr("导入数据"),this);
-    toolBar->addAction(saveAsAction);
-    toolBar->addAction(loadInAction);
+    exportDataAction = new QAction(QIcon(":/icon/export"),tr("导出数据"),this);
+    importDataAction = new QAction(QIcon(":/icon/import"),tr("导入数据"),this);
+    toolBar->addAction(exportDataAction);
+    toolBar->addAction(importDataAction);
+    connect(exportDataAction,&QAction::triggered,this,&MarsConsole::exportData);
+    connect(importDataAction,&QAction::triggered,this,&MarsConsole::importData);
     layout->addWidget(toolBar,1,1);
 }
-bool MarsConsole::createCommandLine(int number,bool view_only,int maxIBufferSize, int maxOBufferSize)
+
+/**
+ *@Desc: create command line,when create successfully return true otherwise return false
+ *@Args: int(command line number), bool(view only), int (command line max input buffer size)
+ * , int(command line max output buffer size)
+ *@Returns: bool
+ */
+bool MarsConsole::createCommandLine(int number,bool viewOnly,int maxIBufferSize, int maxOBufferSize)
 {
 
     MarsCommandLine * tmpCmdLine;
@@ -51,9 +71,9 @@ bool MarsConsole::createCommandLine(int number,bool view_only,int maxIBufferSize
     {
         if(commandLines.size()>=4)
             break;
-        tmpCmdLine = new MarsCommandLine(this,view_only, maxIBufferSize, maxOBufferSize);
-        connect(tmpCmdLine,&MarsCommandLine::dataSaveRequest,this,&MarsConsole::saveDataAs);
-        connect(tmpCmdLine,&MarsCommandLine::dataLoadRequest,this,&MarsConsole::loadDataIn);
+        tmpCmdLine = new MarsCommandLine(this,viewOnly, maxIBufferSize, maxOBufferSize);
+        connect(tmpCmdLine,&MarsCommandLine::dataExportRequest,this,&MarsConsole::exportData);
+        connect(tmpCmdLine,&MarsCommandLine::dataImportRequest,this,&MarsConsole::importData);
         connect(tmpCmdLine,&MarsCommandLine::dataIn,this,&MarsConsole::onCommandLineDataReady);
         commandLines.append(tmpCmdLine);
     }
@@ -87,8 +107,19 @@ bool MarsConsole::createCommandLine(int number,bool view_only,int maxIBufferSize
         commandLine(3).style()->addStyleSheet("border-left:1px solid #666;border-top:1px solid #666;");
         break;
     }
+    if(commandLines.size()>0)
+    {
+        if(viewOnly)
+            importDataAction->setEnabled(false);
+    }
     return true;
 }
+
+/**
+ *@Desc: delete created command line instance and layout
+ *@Args: None
+ *@Returns: None
+ */
 MarsConsole::~MarsConsole()
 {
     for(int i=0;i<commandLines.size();++i)
@@ -98,6 +129,11 @@ MarsConsole::~MarsConsole()
     delete layout;
 }
 
+/**
+ *@Desc: return specific command line instance reference
+ *@Args: int( command line instance index)
+ *@Return: MarsCommandLine &
+ */
 MarsCommandLine & MarsConsole::commandLine(int index)
 {
     if(commandLines.size()==0)
@@ -109,12 +145,23 @@ MarsCommandLine & MarsConsole::commandLine(int index)
         return *(commandLines.last());
     return *(commandLines.at(index));
 }
+
+/**
+ *@Desc: slot function for command line input data ready signal
+ *@Args: None
+ *@Returns: None
+ */
 void MarsConsole::onCommandLineDataReady()
 {
     emit dataReady();
 }
 
-void MarsConsole::saveDataAs()
+/**
+ *@Desc: slot function for saving command  data  to a file
+ *@Args: None
+ *@Returns: None
+ */
+void MarsConsole::exportData()
 {
     QString fullFileName = QFileDialog::getSaveFileName(this,tr("保存为....."),QString(),
                                                     tr("text files(*.txt);;json files(*.json);; xml files(*.xml)"));
@@ -169,7 +216,12 @@ MarsError MarsConsole::errorInstance(QString msg, MarsErrorLevel level)
     return error;
 }
 
-void MarsConsole::loadDataIn()
+/**
+ *@Desc: slot function for loading file data into command line input buffer
+ *@Args: None
+ *@Returns: None
+ */
+void MarsConsole::importData()
 {
     QString fullFileName = QFileDialog::getOpenFileName(this,tr("导入文件"),QString(),
                                      tr("text files(*.txt);;json files(*.json);; xml files(*.xml)"));
@@ -215,34 +267,63 @@ void MarsConsole::loadDataIn()
     }
 }
 
-
+/**
+ *@Desc: read text file and import data into command line input buffer
+ *@Args: QFile *
+ *@Returns: None
+ */
 void MarsConsole::readTextFile(QFile * file)
 {
     QTextStream stream(file);
     commandLine(0)<<stream;
 }
 
+/**
+ *@Desc: write output buffer's data into text file
+ *@Args: QFile *
+ *@Returns: None
+ */
 void MarsConsole::writeTextFile(QFile * file)
 {
     QTextStream stream(file);
     stream<<commandLine(0).outputBufferText();
 }
 
+/**
+ *@Desc: read josn file and import data into  input buffer
+ *@Args: QFile *
+ *@Returns: None
+ */
 void MarsConsole::readJSONFile(QFile *file)
 {
 
 }
 
+/**
+ *@Desc: write output buffer's data into json file
+ *@Args: QFile * file
+ *@Returns: None
+ */
 void MarsConsole::writeJSONFile(QFile * file)
 {
 
 }
 
+/**
+ *@Desc: read xml file and import data into input buffer
+ *@Args: QFile * file
+ *@Returns: None
+ */
 void MarsConsole::readXMLFile(QFile * file)
 {
 
 }
 
+/**
+ *@Desc: write output buffer's data into  file
+ *@Args: QFile *file
+ *@Returns: None
+ */
 void MarsConsole::writeXMLFile(QFile * file)
 {
 

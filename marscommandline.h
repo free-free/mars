@@ -45,7 +45,7 @@ public:
     };
 
 public:
-    explicit MarsCommandLine(QWidget * parent = 0, bool view_only=false,int maxIBufferSize=500,int maxOBufferSize=1000);
+    explicit MarsCommandLine(QWidget * parent = 0, bool viewOnly=false,int maxIBufferSize=500,int maxOBufferSize=1000);
     ~MarsCommandLine();
     void printData(QByteArray data);
     void printData(QString data);
@@ -76,15 +76,15 @@ public:
 public slots:
     void createCustomContextMenu(QPoint pos);
     void clearAll();
-    void saveData();
-    void loadData();
+    void exportData();
+    void importData();
 
 
 signals:
     void dataIn();
     void error(const MarsError & error );
-    void dataSaveRequest();
-    void dataLoadRequest();
+    void dataImportRequest();
+    void dataExportRequest();
 
 private:
     Style * cmdStyle;

@@ -62,11 +62,11 @@ QTextStream & operator>>(QTextStream & in,QList<QByteArray> *list)
 }
 
 
-MarsCommandLine::MarsCommandLine(QWidget * parent, bool view_only,int maxIBufferSize, int maxOBufferSize):QPlainTextEdit(parent)
+MarsCommandLine::MarsCommandLine(QWidget * parent, bool viewOnly,int maxIBufferSize, int maxOBufferSize):QPlainTextEdit(parent)
 {
     document()->setMaximumBlockCount(100);
     cmdStyle = new MarsCommandLine::Style(this);
-    if(view_only)
+    if(viewOnly)
         setReadOnly(true);
     else
         cursorNextLine();
@@ -83,7 +83,7 @@ void MarsCommandLine::createCustomContextMenu(QPoint pos)
     QAction *pasteAction = new QAction(tr("粘    贴"),contextMenu);
     QAction *selectAllAction = new QAction(tr("全    选"),contextMenu);
     QAction *clearAction = new QAction(tr("清    除"),contextMenu);
-    QAction * saveAsAction = new QAction(tr("另  存  为"),contextMenu);
+    QAction * saveAsAction = new QAction(tr("导    出"),contextMenu);
     QAction * loadInAction = new QAction(tr("导    入"),contextMenu);
     contextMenu->setStyleSheet(
                 "QMenu{"
@@ -130,8 +130,8 @@ void MarsCommandLine::createCustomContextMenu(QPoint pos)
     connect(pasteAction,&QAction::triggered,this,&MarsCommandLine::paste);
     connect(clearAction,&QAction::triggered,this,&MarsCommandLine::clearAll);
     connect(selectAllAction,&QAction::triggered,this,&MarsCommandLine::selectAll);
-    connect(saveAsAction,&QAction::triggered,this,&MarsCommandLine::saveData);
-    connect(loadInAction,&QAction::triggered,this,&MarsCommandLine::loadData);
+    connect(saveAsAction,&QAction::triggered,this,&MarsCommandLine::exportData);
+    connect(loadInAction,&QAction::triggered,this,&MarsCommandLine::importData);
     contextMenu->popup(viewport()->mapToGlobal(pos));
 }
 MarsCommandLine::~MarsCommandLine()
@@ -393,23 +393,23 @@ void MarsCommandLine::contextMenuEvent(QContextMenuEvent *e)
 
 
 /**
- *@Desc: emit dataSaveRequest signal
+ *@Desc: emit dataExportRequest signal
  *@Args: None
  *@Returns: None
  */
-void MarsCommandLine::saveData()
+void MarsCommandLine::exportData()
 {
-    emit dataSaveRequest();
+    emit dataExportRequest();
 }
 
 /**
- *@Desc: emit dataLoadRequest signal
+ *@Desc: emit dataImportRequest signal
  *@Args: None
  *@Returns: None
  */
-void MarsCommandLine::loadData()
+void MarsCommandLine::importData()
 {
-   emit dataLoadRequest();
+   emit dataImportRequest();
 }
 /**
 

@@ -150,6 +150,9 @@ MarsCommandLine::~MarsCommandLine()
 void MarsCommandLine::printData(QByteArray  data)
 {
     /* please implement me ,bitch*/
+     qDebug()<<data;
+    if(data.isEmpty())
+        return ;
     cursorNextLine();
     insertPlainText(data);
     out->append(data);
@@ -164,6 +167,9 @@ void MarsCommandLine::printData(QByteArray  data)
 void MarsCommandLine::printData(QString data)
 {
 
+    qDebug()<<data;
+    if(data.isEmpty())
+        return ;
     cursorNextLine();
     insertPlainText(data);
     out->append(data);
@@ -195,9 +201,13 @@ QByteArray MarsCommandLine::readData()
  */
 MarsCommandLine & MarsCommandLine::operator <<(const QByteArray &data)
 {
+
     printData(data);
-    in->append(data);
-    emit dataIn();
+    if(!isReadOnly())
+    {
+        in->append(data);
+        emit dataIn();
+    }
     return *this;
 }
 
@@ -210,8 +220,11 @@ MarsCommandLine & MarsCommandLine::operator <<(const QByteArray &data)
 MarsCommandLine & MarsCommandLine::operator <<(const QString &data)
 {
     printData(data);
-    in->append(data);
-    emit dataIn();
+    if(!isReadOnly())
+    {
+        in->append(data);
+        emit dataIn();
+    }
     return *this;
 }
 
@@ -224,8 +237,11 @@ MarsCommandLine & MarsCommandLine::operator <<( MarsCommandLine &dataSender)
 {
 
     printData(dataSender.readData());
-    in->append(out->last());
-    emit dataIn();
+    if(!isReadOnly())
+    {
+        in->append(out->last());
+        emit dataIn();
+    }
     return *this;
 }
 /**
@@ -235,9 +251,13 @@ MarsCommandLine & MarsCommandLine::operator <<( MarsCommandLine &dataSender)
  */
 MarsCommandLine & MarsCommandLine::operator <<(QTextStream & dataSender)
 {
+
     printData(dataSender.readAll());
-    in->append(out->last());
-    emit dataIn();
+    if(!isReadOnly())
+    {
+        in->append(out->last());
+        emit dataIn();
+    }
     return *this;
 }
 /**

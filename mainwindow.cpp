@@ -4,26 +4,35 @@
 #include "marsserialport.h"
 #include "marscommandline.h"
 #include "marsconsole.h"
+#include "marsfigure.h"
+#include "qcustomplot.h"
 
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QAction>
 #include <QDebug>
 #include <QGridLayout>
-
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    mainWidgetGridLayout = new QGridLayout(ui->mainWidget);
+    mainWidgetLayout = new QGridLayout(ui->mainWidget);
+    mainWidgetLayout->setSpacing(0);
+    mainWidgetLayout->setContentsMargins(0,0,0,0);
     serialPortSettingsDialog = new SPSettingsDialog(this);
     devSerialPort = new MarsSerialPort(serialPortSettingsDialog->settings(),this);
-    ui->mainWidget->setLayout(mainWidgetGridLayout);
-    createConsoleWindow();
+    ui->mainWidget->setLayout(mainWidgetLayout);
+    inConsole=NULL;
+    outConsole=NULL;
+    figure = NULL;
+    renderConsoleWindow();
     initConnections();
     onSerialPortClosed();
+
+
 
 }
 
@@ -82,7 +91,8 @@ void MainWindow::initConnections()
     connect(ui->serialPortConfigDialogAction,&QAction::triggered,this,&MainWindow::onSerialPortConfigDialogActionTriggered);
     connect(ui->exitAppAction,&QAction::triggered,this,&QApplication::exit);
 
-
+    connect(ui->consoleWindowBtn,&QPushButton::clicked,this,&MainWindow::onConsoleWindowBtnClicked);
+    connect(ui->figureWindowBtn,&QPushButton::clicked,this, &MainWindow::onFigureWindowBtnClicked);
 }
 
 /*
@@ -166,30 +176,55 @@ void MainWindow::onSerialPortDataReady()
     //
 }
 
-
-void MainWindow::createConsoleWindow()
+void MainWindow::onConsoleWindowBtnClicked()
 {
-    /*
-    outConsole  = new MarsCommandLine(ui->mainWidget,true);
-    inConsole = new MarsCommandLine(ui->mainWidget);
-    inConsole->style()->addStyleSheet("border-right:1px solid #666;");
-    outConsole->style()->addStyleSheet("border-left:1px solid #666;");
-    outConsole->style()->prompt(">>>>>   ");
-    mainWidgetGridLayout->addWidget(inConsole,1,0);
-    mainWidgetGridLayout->addWidget(outConsole,1,1);
-    mainWidgetGridLayout->setSpacing(0);
-    mainWidgetGridLayout->setContentsMargins(0,0,0,0);
-    connect(inConsole,&MarsCommandLine::dataReadyRead,this,&MainWindow::onCmdConsoleDataReady);
-    */
-    outConsole = new MarsConsole(ui->mainWidget,true);
-    inConsole = new MarsConsole(ui->mainWidget);
+    if(currentWindowId != 0)
+        switchWindow(0);
+}
+
+void MainWindow::onFigureWindowBtnClicked()
+{
+    if(currentWindowId != 1)
+        switchWindow(1);
+}
+
+
+
+void MainWindow::renderConsoleWindow()
+{
+    if(!outConsole)
+        outConsole = new MarsConsole(ui->mainWidget,true);
+    if(!inConsole)
+        inConsole = new MarsConsole(ui->mainWidget);
     inConsole->commandLine(0).style()->addStyleSheet("border-right:1px solid #666;");
     outConsole->commandLine(0).style()->addStyleSheet("border-left:1px solid #666;");
-    mainWidgetGridLayout->addWidget(inConsole,1,0);
-    mainWidgetGridLayout->addWidget(outConsole,1,1);
-    mainWidgetGridLayout->setSpacing(0);
-    mainWidgetGridLayout->setContentsMargins(0,0,0,0);
+    inConsole->setHidden(false);
+    outConsole->setHidden(false);
+    mainWidgetLayout->addWidget(inConsole,1,1);
+    mainWidgetLayout->addWidget(outConsole,1,2);
+
     connect(inConsole,&MarsConsole::dataReady,this,&MainWindow::onConsoleDataReady);
+    currentWindowId = 0;
+
+}
+
+
+void MainWindow::renderFigureWindow()
+{
+
+    if(!figure)
+    {
+        figure = new MarsFigure(ui->mainWidget);
+        tick = new QTimer(this);
+        tick->setInterval(100);
+        tick->start();
+        connect(tick,&QTimer::timeout,this,&MainWindow::tickTask);
+    }
+    figure->setHidden(false);
+    mainWidgetLayout->addWidget(figure,1,1);
+    currentWindowId = 1;
+
+
 }
 
 
@@ -199,17 +234,62 @@ void MainWindow::onConsoleDataReady()
     (inConsole->commandLine(0))>>(outConsole->commandLine(0));
 }
 
+void MainWindow::tickTask()
+{
+    static int lastX=0;
+    double x,y1,y2;
+      x = lastX;
+      //y1 = qExp(-x/150.0)*qCos(x/10.0)*10;
+      y1 = qCos(x/10.0)*5;
+      y2 = qExp(-x/150.0)*5;
+    qDebug()<<"x:"<<x<<"y1:"<<y1<<"y2:"<<y2;
+    figure->plot(0,x,y1);
+    figure->plot(1,x,y2);
+    lastX++;
+
+}
+
+void MainWindow::beforeSwitchWindow()
+{
+
+    switch(currentWindowId)
+    {
+        // remove console window from layout and hide it
+        case 0:
+            mainWidgetLayout->removeWidget(inConsole);
+            mainWidgetLayout->removeWidget(outConsole);
+            inConsole->setHidden(true);
+            outConsole->setHidden(true);
+            break;
+        // remove figure window from layout and hide it
+        case 1:
+            mainWidgetLayout->removeWidget(figure);
+            figure->setHidden(true);
+            break;
+    }
+}
 
 
-
-
-
-
-
-
-
-
-
+void MainWindow::switchWindow(int windowId)
+{
+    if(currentWindowId == windowId)
+        return ;
+    beforeSwitchWindow();
+    switch(windowId)
+    {
+        // console window
+        case 0:
+            renderConsoleWindow();
+            break;
+        // figure window
+        case 1:
+            renderFigureWindow();
+            break;
+        default:
+            renderConsoleWindow();
+        break;
+    }
+}
 
 
 

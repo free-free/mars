@@ -11,6 +11,8 @@ class MarsSerialPort;
 class SPSettingsDialog;
 class MarsCommandLine;
 class MarsConsole;
+class MarsFigure;
+class QTimer;
 
 namespace Ui {
 class MainWindow;
@@ -57,22 +59,30 @@ private slots:
     // connect to serialPortConfigDialogAction's triggered signal
     void onSerialPortConfigDialogActionTriggered();
 
+    void onConsoleWindowBtnClicked();
+    void onFigureWindowBtnClicked();
+
     void onConsoleDataReady();
 
 public:
-    void createConsoleWindow();
+    void renderConsoleWindow();
+    void renderFigureWindow();
+    void switchWindow(int windowId);
+    void tickTask();
+private:
 
-
+    void beforeSwitchWindow();
 
 private:
     Ui::MainWindow *ui;
     MarsSerialPort * devSerialPort;
     SPSettingsDialog * serialPortSettingsDialog;
-    //MarsCommandLine *outConsole;
-    //MarsCommandLine *inConsole;
     MarsConsole * outConsole;
     MarsConsole * inConsole;
-    QGridLayout * mainWidgetGridLayout;
+    MarsFigure * figure;
+    QGridLayout * mainWidgetLayout;
+    int currentWindowId;
+    QTimer *tick;
 
 };
 

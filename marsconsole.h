@@ -17,6 +17,7 @@ public:
     explicit MarsConsole(QWidget *parent = 0,bool view_only=false,int maxIBufferSize=500,int maxOBufferSize=1000);
     ~MarsConsole();
     MarsCommandLine & commandLine(int index = 0);
+     MarsError  errorInstance(QString msg, MarsErrorLevel level);
 
 signals:
     void error(MarsError  error);
@@ -32,16 +33,16 @@ public slots:
     void writeXMLFile(QFile * file);
     void readJSONFile(QFile * file);
     void writeJSONFile(QFile* file);
-    MarsError  errorInstance(QString msg, MarsErrorLevel level);
     void onCommandLineDataReady();
     bool createCommandLine(int number,bool viewOnly=false,int maxIBufferSize=500, int maxOBufferSize=1000);
-    void createToolBar();
+    void initToolBar();
 private:
     QList<MarsCommandLine*> commandLines;
     QGridLayout * layout;
     QToolBar * toolBar;
     QAction * exportDataAction;
     QAction * importDataAction;
+
 
 };
 

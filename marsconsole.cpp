@@ -20,20 +20,20 @@ MarsConsole::MarsConsole(QWidget *parent,bool viewOnly,int maxIBufferSize,int ma
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
     this->setLayout(layout);
-    // note!!!: createToolBar() must be called before createCommandLine(*);
-    createToolBar();
+    // note!!!: initToolBar() must be called before createCommandLine(*);
+    initToolBar();
     createCommandLine(1,viewOnly,maxIBufferSize,maxOBufferSize);
 
 }
 
 
 /**
- *@Desc: create tool bar
+ *@Desc: init tool bar
  *@Args: None
  *@Returns: None
  *
  */
-void MarsConsole::createToolBar()
+void MarsConsole::initToolBar()
 {
     toolBar = new QToolBar("hello",this);
     toolBar->setStyleSheet(
@@ -45,7 +45,7 @@ void MarsConsole::createToolBar()
 
                            );
     toolBar->setAutoFillBackground(true);
-    toolBar->setFixedHeight(25);
+    toolBar->setFixedHeight(30);
     toolBar->setContentsMargins(0,0,0,0);
     toolBar->setOrientation(Qt::Horizontal);
     exportDataAction = new QAction(QIcon(":/icon/export"),tr("导出数据"),this);

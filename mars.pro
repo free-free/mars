@@ -20,7 +20,9 @@ SOURCES += main.cpp\
     marsbyteslistbuffer.cpp \
     marsconsole.cpp \
     marsserialport.cpp \
-    marscommandline.cpp
+    marscommandline.cpp \
+    marsdatawidget.cpp \
+    marsfigure.cpp
 
 HEADERS  += mainwindow.h \
     spsettingsdialog.h \
@@ -29,7 +31,9 @@ HEADERS  += mainwindow.h \
     marsbyteslistbuffer.h \
     marsconsole.h \
     marscommandline.h \
-    marsserialport.h
+    marsserialport.h \
+    marsdatawidget.h \
+    marsfigure.h
 
 FORMS    += mainwindow.ui \
     spsettingsdialog.ui

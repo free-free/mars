@@ -27,7 +27,7 @@ MarsPlot::~MarsPlot()
 
 
 /**
- *@Desc: override QCustomPlot's wheelEvent to handle xAxis zooming and yAxis zooming singly;
+ *@Desc: override QCustomPlot's wheelEvent to handle xAxis zooming and yAxis zooming seperately
  *@Args: QWheelEvent *
  *@Returns: None
  *

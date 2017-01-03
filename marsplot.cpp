@@ -2,18 +2,36 @@
 #include "qcustomplot.h"
 #include <QWheelEvent>
 
+
+/**
+ *@Desc: do no thing here
+ *@Args: None
+ *@Returns: None
+ */
 MarsPlot::MarsPlot(QWidget * parent ):QCustomPlot(parent)
 {
-    /* nothing is here now */
+    /* hi,buddy you can fuck here */
 }
 
 
+/**
+ *@Desc: do thing here
+ *@Args: None
+ *@Return: None
+ *
+ */
 MarsPlot::~MarsPlot()
 {
-    /* nothing is here now */
+    /* hi,buddy you can fuck here */
 }
 
 
+/**
+ *@Desc: override QCustomPlot's wheelEvent to handle xAxis zooming and yAxis zooming singly;
+ *@Args: QWheelEvent *
+ *@Returns: None
+ *
+ */
 void MarsPlot::wheelEvent(QWheelEvent *event)
 {
 
@@ -32,5 +50,5 @@ void MarsPlot::wheelEvent(QWheelEvent *event)
 
     }
     QCustomPlot::wheelEvent(event);
-    qDebug()<<"mars plot's wheel event be called";
+
 }

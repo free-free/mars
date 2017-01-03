@@ -8,5 +8,9 @@
         <file alias="save">resources/icon/save.png</file>
         <file alias="export">resources/icon/export.png</file>
         <file alias="import">resources/icon/import.png</file>
+        <file alias="start">resources/icon/start.png</file>
+        <file alias="pause">resources/icon/pause.png</file>
+        <file alias="graph">resources/icon/graph.png</file>
+        <file alias="tiny-down-arrow">resources/icon/tiny-down-arrow.png</file>
     </qresource>
 </RCC>

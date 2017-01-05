@@ -22,8 +22,12 @@ SOURCES += main.cpp\
     marsserialport.cpp \
     marscommandline.cpp \
     marsdatawidget.cpp \
+<<<<<<< HEAD
     marsfigure.cpp \
     marsplot.cpp
+=======
+    marsfigure.cpp
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 
 HEADERS  += mainwindow.h \
     spsettingsdialog.h \
@@ -34,8 +38,12 @@ HEADERS  += mainwindow.h \
     marscommandline.h \
     marsserialport.h \
     marsdatawidget.h \
+<<<<<<< HEAD
     marsfigure.h \
     marsplot.h
+=======
+    marsfigure.h
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 
 FORMS    += mainwindow.ui \
     spsettingsdialog.ui

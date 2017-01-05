@@ -12,7 +12,10 @@
         <file alias="pause">resources/icon/pause.png</file>
         <file alias="graph">resources/icon/graph.png</file>
         <file alias="tiny-down-arrow">resources/icon/tiny-down-arrow.png</file>
+<<<<<<< HEAD
         <file alias="delete-plot">resources/icon/delete-plot.png</file>
         <file alias="create-plot">resources/icon/create-plot.png</file>
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     </qresource>
 </RCC>

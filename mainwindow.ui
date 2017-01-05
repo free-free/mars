@@ -76,9 +76,12 @@ padding:0px 0px 0px 0px;</string>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+<<<<<<< HEAD
        <property name="focusPolicy">
         <enum>Qt::NoFocus</enum>
        </property>
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
        <property name="styleSheet">
         <string notr="true">
 QPushButton{
@@ -92,14 +95,19 @@ QPushButton:hover
 {
       background-color:#999;
 }
+<<<<<<< HEAD
 QPushButton:default{
 	  background-color:#444;
      color:#99ccff;
 }</string>
+=======
+</string>
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
        </property>
        <property name="text">
         <string> 图形</string>
        </property>
+<<<<<<< HEAD
        <property name="iconSize">
         <size>
          <width>0</width>
@@ -115,6 +123,8 @@ QPushButton:default{
        <property name="flat">
         <bool>false</bool>
        </property>
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
       </widget>
       <widget class="QPushButton" name="histogramBtn">
        <property name="geometry">
@@ -125,9 +135,12 @@ QPushButton:default{
          <height>51</height>
         </rect>
        </property>
+<<<<<<< HEAD
        <property name="focusPolicy">
         <enum>Qt::NoFocus</enum>
        </property>
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
        <property name="styleSheet">
         <string notr="true">
 QPushButton{
@@ -141,10 +154,13 @@ QPushButton:hover
 {
       background-color:#999;
 }
+<<<<<<< HEAD
 
 QPushButton:default{
 	  background-color:#444;
 }
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 </string>
        </property>
        <property name="text">
@@ -166,9 +182,12 @@ QPushButton:default{
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+<<<<<<< HEAD
        <property name="focusPolicy">
         <enum>Qt::NoFocus</enum>
        </property>
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
        <property name="styleSheet">
         <string notr="true">
 QPushButton{
@@ -188,19 +207,26 @@ QPushButton:pressed
 		background-color:#999;
        
 }
+<<<<<<< HEAD
 QPushButton:default{
 	  background-color:#444;
 	 color:#99ccff;
 }
+=======
+
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 
 </string>
        </property>
        <property name="text">
         <string>控制台</string>
        </property>
+<<<<<<< HEAD
        <property name="default">
         <bool>true</bool>
        </property>
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
       </widget>
       <widget class="QLabel" name="spaceLabel">
        <property name="geometry">

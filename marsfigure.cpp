@@ -8,8 +8,11 @@
 #include <QComboBox>
 #include <QVBoxLayout>
 #include "qcustomplot.h"
+<<<<<<< HEAD
 #include "marsplot.h"
 
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 
 MarsFigure::MarsFigure(QWidget *parent) : QWidget(parent)
 {
@@ -17,6 +20,7 @@ MarsFigure::MarsFigure(QWidget *parent) : QWidget(parent)
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
     this->setLayout(layout);
+<<<<<<< HEAD
 
     // Note:!!!
     // initToolBar() must be called before initPlot(),
@@ -25,6 +29,14 @@ MarsFigure::MarsFigure(QWidget *parent) : QWidget(parent)
     initPlot();
     connect(this,&MarsFigure::getImportFileName,this,&MarsFigure::readFile);
     connect(this,&MarsFigure::getExportFileName,this,&MarsFigure::writeFile);
+=======
+    // Note:!!!
+    // initToolBar() must be called before initPlot(),
+    // fuck ,yeah i have written this shit code !!!!!!!!!!!!!!!
+    initToolBar();
+    initPlot();
+
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 }
 
 MarsFigure::~MarsFigure()
@@ -34,15 +46,23 @@ MarsFigure::~MarsFigure()
     delete plotAction;
     delete saveGraphAction;
     delete clearGraphAction;
+<<<<<<< HEAD
     delete deletePloterAction;
     delete createPloterAction;
     delete ploterContainer;
     delete plotLayout;
+=======
+    delete ploterContainer;
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     delete layout;
 }
 
 /**
+<<<<<<< HEAD
  *@Desc: init tool bar
+=======
+ *@Desc: create tool bar
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
  *@Args: None
  *@Returns: None
  *
@@ -65,14 +85,22 @@ void MarsFigure::initToolBar()
     toolBar->setOrientation(Qt::Horizontal);
     toolBar->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
     plotAction = new QAction(QIcon(":/icon/start"),tr("开始绘制"),this);
+<<<<<<< HEAD
     createPloterAction = new QAction(QIcon(":/icon/create-plot"),tr("新建图像"),this);
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     saveGraphAction = new QAction(QIcon(":/icon/save"),tr("保存图像"),this);
     exportDataAction = new QAction(QIcon(":/icon/export"),tr("导出数据"),this);
     importDataAction = new QAction(QIcon(":/icon/import"),tr("导入数据"),this);
     clearGraphAction = new QAction(QIcon(":/icon/clear"),tr("清除图像"),this);
+<<<<<<< HEAD
     deletePloterAction = new QAction(QIcon(":/icon/delete-plot"),tr("删除图像"),this);
     ploterNameListBox =new QComboBox(this);
     ploterNameListBox->setStyleSheet("QComboBox{"
+=======
+    plotNameListBox =new QComboBox(this);
+    plotNameListBox->setStyleSheet("QComboBox{"
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
                              "padding:0px 10px 0px 10px;"
                              "margin:0px 0px 0px 0px;"
                              "border:0px 0px 0px 0px;"
@@ -91,16 +119,29 @@ void MarsFigure::initToolBar()
                          "QComboBox::hover{"
                             "background-color:#888;"
                          "}"
+<<<<<<< HEAD
                          );
 
     toolBar->addAction(plotAction);
     toolBar->addAction(createPloterAction);
     toolBar->addSeparator();
     toolBar->addWidget(ploterNameListBox);
+=======
+                         "QComboBox::on{"
+                            "background-color:#f1f2f3;"
+                            "color:#666;"
+                         "}"
+                         );
+
+    toolBar->addAction(plotAction);
+    toolBar->addSeparator();
+    toolBar->addWidget(plotNameListBox);
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     toolBar->addAction(saveGraphAction);
     toolBar->addAction(exportDataAction);
     toolBar->addAction(importDataAction);
     toolBar->addAction(clearGraphAction);
+<<<<<<< HEAD
     toolBar->addAction(deletePloterAction);
     connect(saveGraphAction,&QAction::triggered,this,&MarsFigure::saveGraph);
     connect(exportDataAction,&QAction::triggered,this,&MarsFigure::showExportDataDialog);
@@ -232,6 +273,18 @@ void MarsFigure::arrangePloter()
             break;
     }
 }
+=======
+    connect(saveGraphAction,&QAction::triggered,this,&MarsFigure::saveGraph);
+    connect(exportDataAction,&QAction::triggered,this,&MarsFigure::exportData);
+    connect(importDataAction,&QAction::triggered,this,&MarsFigure::importData);
+    connect(plotAction,&QAction::triggered,this,&MarsFigure::onPlotActionTriggered);
+    connect(clearGraphAction,&QAction::triggered,this,&MarsFigure::clearGraph);
+    connect(plotNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentPloter(int)));
+    layout->addWidget(toolBar);
+}
+
+
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 /**
  *@Desc: start plot(including set plot state to true ,call replot function  and emit plotStarted signal
  *@Args: None
@@ -245,6 +298,10 @@ void MarsFigure::startPlot()
     {
        ploterContainer->at(i)->replot();
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     emit plotStarted();
 }
 
@@ -300,10 +357,13 @@ void MarsFigure::changeCurrentPloter(int index)
 void MarsFigure::clearGraph()
 {
     currentPloter->clearGraphs();
+<<<<<<< HEAD
     for(int i=0;i<currentPloter->graphCount();i++)
     {
         currentPloter->graph(i)->data()->clear();
     }
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     currentPloter->replot();
 }
 
@@ -329,6 +389,7 @@ QColor MarsFigure::graphColor(int graphId)
     }
 }
 
+<<<<<<< HEAD
 /**
  *@Desc: fuck you, to plot
  *@Args: QList<QByteArray> & data
@@ -488,6 +549,158 @@ void MarsFigure::plot(QVector<double> &x, QVector<double> &y, int graphId, int p
 }
 
 
+=======
+
+void MarsFigure::plot(QList<QByteArray> & data)
+{
+
+}
+
+void MarsFigure::plot(QByteArray & data)
+{
+
+}
+
+void MarsFigure::plot(QString &data)
+{
+    /*
+    QStringList dataLines = data.split('\n');
+    QStringList dataLineItems;
+    QStringList dataVector;
+    int graphId = 0;
+    if(dataLines.length()>0)
+    {
+        int maxGraphId = dataLines.at(0).split(';').length()-1;
+        if((maxGraphId+1)>ploter->graphCount())
+        {
+            for(int i=0;i<(maxGraphId-ploter->graphCount()+1);++i)
+            {
+                graphId = i+ploter->graphCount();
+                ploter->addGraph();
+                ploter->graph()->setPen(QPen(graphColor(graphId)));
+                ploter->graph(graphId)->rescaleAxes(false);
+            }
+
+        }
+
+    }
+    for(int j=0;j<dataLines.length();++j)
+    {
+        dataLineItems = dataLines.at(j).split(';');
+        for(int i=0;i<dataLineItems.length();++i)
+        {
+            dataVector = dataLineItems.at(i).split(',');
+            ploter->graph(i)->addData(dataVector[0].toDouble(),dataVector[1].toDouble());
+        }
+    }
+    if(plotState)
+        ploter->replot();
+    */
+}
+
+void MarsFigure::plot(int graphId,double x, double y)
+{
+
+    if((graphId+1)>currentPloter->graphCount())
+    {
+        currentPloter->addGraph();
+        currentPloter->graph(graphId)->setPen(QPen(graphColor(graphId)));
+        //ploter->graph(graphId)->rescaleAxes(false);
+    }
+
+    currentPloter->graph(graphId)->addData(x,y);
+    //ploter->graph(graphId)->rescaleValueAxis();
+    //ploter->graph(graphId)->rescaleKeyAxis();
+    currentPloter->xAxis->setRange(x+10,100,Qt::AlignRight);
+    if(plotState)
+        currentPloter->replot();
+
+}
+
+void MarsFigure::plot(int graphId, QVector<double> &x,QVector<double> &y)
+{
+    /*
+    graphId = abs(graphId);
+    // if no such graph id,then create id
+    if((graphId+1)>ploter->graphCount())
+    {
+        ploter->addGraph();
+        ploter->graph(graphId)->setPen(QPen(graphColor(graphId)));
+        ploter->graph(graphId)->rescaleAxes(false);
+    }
+    ploter->graph(graphId)->addData(x,y);
+    if(plotState)
+        ploter->replot();
+     */
+}
+
+
+
+/**
+ *@Desc: create ploter instance and config it ,finally append it to ploterContainter
+ *@Args: None
+ *@Returns: QCustomPlot *
+ *
+ */
+QCustomPlot* MarsFigure::createPloter()
+{
+
+    QCustomPlot * tmpPloter;
+    // greater than max ploter number
+    if(ploterContainer->length()> MAX_PLOTER_NUMBER)
+        return NULL;
+    tmpPloter = new QCustomPlot(this);
+    tmpPloter->xAxis2->setVisible(true);
+    tmpPloter->xAxis2->setTickLabels(false);
+    tmpPloter->yAxis2->setVisible(true);
+    tmpPloter->yAxis2->setTickLabels(false);
+    tmpPloter->xAxis->setLabel("x");
+    tmpPloter->yAxis->setLabel("y");
+    tmpPloter->xAxis->setLabelPadding(0);
+    tmpPloter->yAxis->setLabelPadding(0);
+    // make left and bottom axes always transfer their ranges to right and top axes:
+    connect(tmpPloter->xAxis, SIGNAL(rangeChanged(QCPRange)), tmpPloter->xAxis2, SLOT(setRange(QCPRange)));
+    connect(tmpPloter->yAxis, SIGNAL(rangeChanged(QCPRange)), tmpPloter->yAxis2, SLOT(setRange(QCPRange)));
+
+    // let the ranges scale themselves so graph 0 fits perfectly in the visible area:
+    //ploter->graph(0)->rescaleAxes(false);
+    // same thing for graph 1, but only enlarge ranges (in case graph 1 is smaller than graph 0):
+    //ploter->graph(1)->rescaleAxes(true);
+    // Note: we could have also just called plot->rescaleAxes(); instead
+    // Allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking:
+    tmpPloter->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ploterContainer->append(tmpPloter);
+    switch(ploterContainer->length())
+    {
+        case 1:
+            plotLayout->addWidget(ploterContainer->at(0),1,1);
+            break;
+        case 2:
+            plotLayout->addWidget(ploterContainer->at(0),1,1);
+            plotLayout->addWidget(ploterContainer->at(1),2,1);
+            break;
+        case 3:
+            plotLayout->addWidget(ploterContainer->at(0),1,1,1,2);
+            plotLayout->addWidget(ploterContainer->at(1),2,1);
+            plotLayout->addWidget(ploterContainer->at(2),2,2);
+            break;
+        case 4:
+            plotLayout->addWidget(ploterContainer->at(0),1,1);
+            plotLayout->addWidget(ploterContainer->at(1),2,1);
+            plotLayout->addWidget(ploterContainer->at(2),2,2);
+            plotLayout->addWidget(ploterContainer->at(3),1,2);
+            break;
+        default:
+            break;
+    }
+    /* get new created ploter's id */
+    int ploterId = ploterContainer->length()-1;
+    /* add new ploter name to plotNameListBox with ploter id as data */
+    plotNameListBox->addItem("plot "+(ploterId),ploterId);
+    return tmpPloter;
+}
+
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 /**
  *@Desc: return error instance
  *@Args:  QString ,MarsErrorLevel
@@ -505,6 +718,7 @@ MarsError MarsFigure::errorInstance(QString msg, MarsErrorLevel level)
 
 
 /**
+<<<<<<< HEAD
  *@Desc: save plot graph as a file
  *@Args: None
  *@Return: None
@@ -554,10 +768,22 @@ void MarsFigure::showExportDataDialog()
     QString fileName = QFileDialog::getSaveFileName(this,tr("导出数据"),QString(),
                                                     tr("text files(*.txt);;json files(*.json);; xml files(*.xml)"));
     if(fileName.isEmpty())
+=======
+ *@Desc: slot function for saving   data  to a file
+ *@Args: None
+ *@Returns: None
+ */
+void MarsFigure::exportData()
+{
+    QString fullFileName = QFileDialog::getSaveFileName(this,tr("导出数据"),QString(),
+                                                    tr("text files(*.txt);;json files(*.json);; xml files(*.xml)"));
+    if(fullFileName.isEmpty())
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     {
         emit error(errorInstance(tr("文件名不能为空"),ERROR));
         return ;
     }
+<<<<<<< HEAD
     QTimer::singleShot(10,[=](){
         emit getExportFileName(fileName);
     });
@@ -578,6 +804,16 @@ void MarsFigure::writeFile(const QString &fileName)
         return ;
     }
     QString fileType =fileName.split('.').last();
+=======
+    QFile file(fullFileName);
+    if(!file.open(QIODevice::WriteOnly))
+    {
+        QString shortFileName = (fullFileName.split(QRegExp("[/\\]+"))).last();
+        emit error(errorInstance(shortFileName+"打开失败",ERROR));
+        return ;
+    }
+    QString fileType =fullFileName.split('.').last();
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     fileType = fileType.toLower();
     try{
 
@@ -599,6 +835,7 @@ void MarsFigure::writeFile(const QString &fileName)
         file.close();
         emit error(errorInstance("导出数据失败",ERROR));
     }
+<<<<<<< HEAD
 }
 /**
  *@Desc: show importing data dialog
@@ -628,13 +865,41 @@ void MarsFigure::readFile(const QString &fileName)
 {
     QFile file(fileName);
     QString shortFileName = (fileName.split(QRegExp("[/\\]+"))).last();
+=======
+
+
+}
+
+/**
+ *@Desc: slot function for loading file data into command line input buffer
+ *@Args: None
+ *@Returns: None
+ */
+void MarsFigure::importData()
+{
+    QString fullFileName = QFileDialog::getOpenFileName(this,tr("导入文件"),QString(),
+                                     tr("text files(*.txt);;json files(*.json);; xml files(*.xml)"));
+    if(fullFileName.isEmpty())
+    {
+
+        emit error(errorInstance(tr("文件名不能为空"),ERROR));
+        return ;
+    }
+    QFile file(fullFileName);
+    QString shortFileName = (fullFileName.split(QRegExp("[/\\]+"))).last();
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     if(!file.open(QIODevice::ReadOnly))
     {
         emit error(errorInstance(shortFileName+"打开失败",ERROR));
         return ;
     }
+<<<<<<< HEAD
     // max file size 15M
     if(file.size()>1024*1024*15)
+=======
+    // max file size 50M
+    if(file.size()>1024*1024*50)
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     {
         emit error(errorInstance(shortFileName+"大小已超过50M",ERROR));
         return ;
@@ -642,6 +907,10 @@ void MarsFigure::readFile(const QString &fileName)
     QString fileType =shortFileName.split('.').last();
     fileType = fileType.toLower();
     try{
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
         if(fileType=="json")
         {
             readJSONFile(&file);
@@ -654,7 +923,10 @@ void MarsFigure::readFile(const QString &fileName)
         {
             readTextFile(&file);
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
         file.close();
     }catch(exception e)
     {
@@ -662,14 +934,60 @@ void MarsFigure::readFile(const QString &fileName)
         emit error(errorInstance("导入"+shortFileName+"文件数据失败",ERROR));
     }
 }
+<<<<<<< HEAD
 /**
  *@Desc: reading text file and plot data's graph
+=======
+
+/**
+ *@Desc: save plot graph as a file
+ *@Args: None
+ *@Return: None
+ *
+ */
+void MarsFigure::saveGraph()
+{
+    QString fullFileName = QFileDialog::getSaveFileName(this,tr("保存图像"),QString(),
+                tr("pdf files(*.pdf);;jpg files(*.jpg);; png files(*.png);; bmp file(*.bmp);;"));
+    if(fullFileName.isEmpty())
+    {
+        emit error(errorInstance(tr("文件名不能为空"),ERROR));
+        return ;
+    }
+    QString fileType =fullFileName.split('.').last();
+    fileType = fileType.toLower();
+    if(fileType=="pdf")
+    {
+        currentPloter->savePdf(fullFileName);
+    }
+    else if(fileType =="jpg")
+    {
+        currentPloter->saveJpg(fullFileName);
+    }
+    else if(fileType == "png")
+    {
+        currentPloter->savePng(fullFileName);
+    }
+    else if(fileType=="bmp")
+    {
+        currentPloter->saveBmp(fullFileName);
+    }
+    else
+    {
+        currentPloter->saveJpg(fullFileName);
+    }
+
+}
+/**
+ *@Desc: read text file and import data into input buffer
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
  *@Args: QFile *
  *@Returns: None
  */
 void MarsFigure::readTextFile(QFile * file)
 {
 
+<<<<<<< HEAD
     QTextStream stream(file);
     qint64 startTime = QDateTime::currentMSecsSinceEpoch();
     QString data = stream.readAll();
@@ -682,11 +1000,18 @@ void MarsFigure::readTextFile(QFile * file)
 
 /**
  *@Desc: writting graph's data into text file
+=======
+}
+
+/**
+ *@Desc: write output buffer's data into text file
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
  *@Args: QFile *
  *@Returns: None
  */
 void MarsFigure::writeTextFile(QFile * file)
 {
+<<<<<<< HEAD
     QTextStream out(file);
     int graphNumber = currentPloter->graphCount();
     if (graphNumber<=0)
@@ -707,12 +1032,20 @@ void MarsFigure::writeTextFile(QFile * file)
 
 /**
  *@Desc: reading josn file and plot data's graph
+=======
+
+}
+
+/**
+ *@Desc: read josn file and import data into  input buffer
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
  *@Args: QFile *
  *@Returns: None
  */
 void MarsFigure::readJSONFile(QFile *file)
 {
 
+<<<<<<< HEAD
 
     qint64 startTime = QDateTime::currentMSecsSinceEpoch();
     QByteArray saveData=file->readAll();
@@ -758,11 +1091,18 @@ void MarsFigure::readJSONFile(QFile *file)
 
 /**
  *@Desc: writting graph's data into json file
+=======
+}
+
+/**
+ *@Desc: write output buffer's data into json file
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
  *@Args: QFile * file
  *@Returns: None
  */
 void MarsFigure::writeJSONFile(QFile * file)
 {
+<<<<<<< HEAD
     int graphNumber = currentPloter->graphCount();
     if (graphNumber<=0)
         return ;
@@ -801,11 +1141,19 @@ void MarsFigure::writeJSONFile(QFile * file)
 
 /**
  *@Desc: reading xml file and draw data's graph
+=======
+
+}
+
+/**
+ *@Desc: read xml file and import data into input buffer
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
  *@Args: QFile * file
  *@Returns: None
  */
 void MarsFigure::readXMLFile(QFile * file)
 {
+<<<<<<< HEAD
     /*
      *
      * reading data from xml file.
@@ -814,14 +1162,26 @@ void MarsFigure::readXMLFile(QFile * file)
 }
 /**
  *@Desc: writting graph's data to xml file
+=======
+
+}
+
+/**
+ *@Desc: write output buffer's data into  file
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
  *@Args: QFile *file
  *@Returns: None
  */
 void MarsFigure::writeXMLFile(QFile * file)
 {
+<<<<<<< HEAD
     /*
      * writing data into xml file.
      * I also not decide to implement it at this time, it fuck me all the timea, son of bitch
      */
 }
 
+=======
+
+}
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de

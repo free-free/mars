@@ -13,7 +13,10 @@
 #include <QDebug>
 #include <QGridLayout>
 #include <QTimer>
+<<<<<<< HEAD
 #include <QDataStream>
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,6 +35,12 @@ MainWindow::MainWindow(QWidget *parent) :
     renderConsoleWindow();
     initConnections();
     onSerialPortClosed();
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 }
 
 MainWindow::~MainWindow()
@@ -177,21 +186,29 @@ void MainWindow::onSerialPortDataReady()
 void MainWindow::onConsoleWindowBtnClicked()
 {
     if(currentWindowId != 0)
+<<<<<<< HEAD
     {
         switchWindow(0);
         ui->consoleWindowBtn->setDefault(true);
         ui->figureWindowBtn->setDefault(false);
     }
+=======
+        switchWindow(0);
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 }
 
 void MainWindow::onFigureWindowBtnClicked()
 {
     if(currentWindowId != 1)
+<<<<<<< HEAD
     {
         switchWindow(1);
         ui->figureWindowBtn->setDefault(true);
         ui->consoleWindowBtn->setDefault(false);
     }
+=======
+        switchWindow(1);
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 }
 
 
@@ -208,6 +225,10 @@ void MainWindow::renderConsoleWindow()
     outConsole->setHidden(false);
     mainWidgetLayout->addWidget(inConsole,1,1);
     mainWidgetLayout->addWidget(outConsole,1,2);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     connect(inConsole,&MarsConsole::dataReady,this,&MainWindow::onConsoleDataReady);
     currentWindowId = 0;
 
@@ -221,7 +242,11 @@ void MainWindow::renderFigureWindow()
     {
         figure = new MarsFigure(ui->mainWidget);
         tick = new QTimer(this);
+<<<<<<< HEAD
         tick->setInterval(1000);
+=======
+        tick->setInterval(100);
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
         tick->start();
         connect(tick,&QTimer::timeout,this,&MainWindow::tickTask);
     }
@@ -229,6 +254,10 @@ void MainWindow::renderFigureWindow()
     mainWidgetLayout->addWidget(figure,1,1);
     currentWindowId = 1;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
 }
 
 
@@ -242,6 +271,7 @@ void MainWindow::tickTask()
 {
     static int lastX=0;
     double x,y1,y2;
+<<<<<<< HEAD
 
       x = lastX;
       y1 = qExp(-x/150.0)*qCos(x/10.0)*10;
@@ -259,6 +289,15 @@ void MainWindow::tickTask()
       //qDebug()<<"hello";
       //qDebug()<<y;
    // figure->plot(data);
+=======
+      x = lastX;
+      //y1 = qExp(-x/150.0)*qCos(x/10.0)*10;
+      y1 = qCos(x/10.0)*5;
+      y2 = qExp(-x/150.0)*5;
+    qDebug()<<"x:"<<x<<"y1:"<<y1<<"y2:"<<y2;
+    figure->plot(0,x,y1);
+    figure->plot(1,x,y2);
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     lastX++;
 
 }
@@ -286,23 +325,38 @@ void MainWindow::beforeSwitchWindow()
 
 void MainWindow::switchWindow(int windowId)
 {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     if(currentWindowId == windowId)
         return ;
     beforeSwitchWindow();
     switch(windowId)
     {
+<<<<<<< HEAD
         // render console window
         case 0:
             renderConsoleWindow();
             break;
         // render figure window
+=======
+        // console window
+        case 0:
+            renderConsoleWindow();
+            break;
+        // figure window
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
         case 1:
             renderFigureWindow();
             break;
         default:
             renderConsoleWindow();
+<<<<<<< HEAD
             break;
+=======
+        break;
+>>>>>>> 7c783581f0b0f261bf033746213b2068f17038de
     }
 }
 

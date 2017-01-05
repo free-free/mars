@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file alias="exit">resources/icon/application-exit.png</file>
+        <file alias="clear">resources/icon/clear.png</file>
+        <file alias="settings">resources/icon/settings.png</file>
+        <file alias="sp_connect">resources/icon/sp_connect.png</file>
+        <file alias="sp_disconnect">resources/icon/sp_disconnect.png</file>
+        <file alias="save">resources/icon/save.png</file>
+        <file alias="export">resources/icon/export.png</file>
+        <file alias="import">resources/icon/import.png</file>
+        <file alias="start">resources/icon/start.png</file>
+        <file alias="pause">resources/icon/pause.png</file>
+        <file alias="graph">resources/icon/graph.png</file>
+        <file alias="tiny-down-arrow">resources/icon/tiny-down-arrow.png</file>
+        <file alias="delete-plot">resources/icon/delete-plot.png</file>
+        <file alias="create-plot">resources/icon/create-plot.png</file>
+    </qresource>
+</RCC>

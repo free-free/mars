@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>629</width>
+    <height>397</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="groupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:#666;
+width:80px;
+height:auto;
+margin:0px 0px 0px 0px;
+border:0px 0px 0px 0px;
+padding:0px 0px 0px 0px;</string>
+      </property>
+      <property name="title">
+       <string/>
+      </property>
+      <widget class="QPushButton" name="figureWindowBtn">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>80</y>
+         <width>81</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">
+QPushButton{
+border:none;
+background-color:#666;
+color:#efefef;
+width:100%;
+height:40px;
+}
+QPushButton:hover
+{
+      background-color:#999;
+}
+QPushButton:default{
+	  background-color:#444;
+     color:#99ccff;
+}</string>
+       </property>
+       <property name="text">
+        <string> 图形</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="autoExclusive">
+        <bool>false</bool>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="histogramBtn">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>130</y>
+         <width>81</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">
+QPushButton{
+border:none;
+background-color:#666;
+color:#efefef;
+width:100%;
+height:40px;
+}
+QPushButton:hover
+{
+      background-color:#999;
+}
+
+QPushButton:default{
+	  background-color:#444;
+}
+</string>
+       </property>
+       <property name="text">
+        <string>直方图</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="consoleWindowBtn">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>30</y>
+         <width>81</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">
+QPushButton{
+border:none;
+background-color:#666;
+color:#efefef;
+width:100%;
+height:40px;
+}
+QPushButton:hover
+{
+      background-color:#999;
+}
+QPushButton:pressed
+{
+		border:none;
+		background-color:#999;
+       
+}
+QPushButton:default{
+	  background-color:#444;
+	 color:#99ccff;
+}
+
+</string>
+       </property>
+       <property name="text">
+        <string>控制台</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="spaceLabel">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>81</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border:none;
+background-color:#666;
+color:#efefef;
+width:100%;
+height:40px;
+border-bottom:1px solid #333;</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QWidget" name="mainWidget" native="true"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>629</width>
+     <height>48</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">/*
+QMenuBar {
+      height:40px;
+}
+
+QMenuBar::item {
+     spacing:0px;
+    padding:1px 1px 1px 1px;
+}
+*/
+/*
+QMenuBar::item:selected { 
+}
+
+QMenuBar::item:pressed {
+   
+}
+
+*/</string>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>false</bool>
+   </property>
+   <widget class="QMenu" name="helpMenu">
+    <property name="title">
+     <string>帮助</string>
+    </property>
+    <widget class="QMenu" name="protocolDescription">
+     <property name="title">
+      <string>连接协议</string>
+     </property>
+     <addaction name="serialPortProtocolDialogAction"/>
+    </widget>
+    <addaction name="protocolDescription"/>
+    <addaction name="aboutAction"/>
+   </widget>
+   <widget class="QMenu" name="toolsMenu">
+    <property name="title">
+     <string>工具</string>
+    </property>
+    <addaction name="clearScreenAction"/>
+    <addaction name="exportFileAction"/>
+   </widget>
+   <widget class="QMenu" name="configurationsMenu">
+    <property name="title">
+     <string>配置</string>
+    </property>
+    <addaction name="serialPortConfigDialogAction"/>
+   </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>连接
+</string>
+    </property>
+    <widget class="QMenu" name="serialPortMenu">
+     <property name="title">
+      <string>串口</string>
+     </property>
+     <addaction name="connectSPAction"/>
+     <addaction name="disconnectSPAction"/>
+    </widget>
+    <addaction name="serialPortMenu"/>
+    <addaction name="exitAppAction"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="toolsMenu"/>
+   <addaction name="configurationsMenu"/>
+   <addaction name="helpMenu"/>
+  </widget>
+  <action name="action">
+   <property name="text">
+    <string>关于串口</string>
+   </property>
+  </action>
+  <action name="connectSPAction">
+   <property name="icon">
+    <iconset resource="mars_resource.qrc">
+     <normaloff>:/icon/sp_connect</normaloff>:/icon/sp_connect</iconset>
+   </property>
+   <property name="text">
+    <string>连接串口
+</string>
+   </property>
+  </action>
+  <action name="disconnectSPAction">
+   <property name="icon">
+    <iconset resource="mars_resource.qrc">
+     <normaloff>:/icon/sp_disconnect</normaloff>:/icon/sp_disconnect</iconset>
+   </property>
+   <property name="text">
+    <string>关闭串口</string>
+   </property>
+  </action>
+  <action name="exitAppAction">
+   <property name="icon">
+    <iconset resource="mars_resource.qrc">
+     <normaloff>:/icon/exit</normaloff>:/icon/exit</iconset>
+   </property>
+   <property name="text">
+    <string>退出</string>
+   </property>
+  </action>
+  <action name="serialPortProtocolDialogAction">
+   <property name="text">
+    <string>串口协议</string>
+   </property>
+  </action>
+  <action name="aboutAction">
+   <property name="text">
+    <string> 关于</string>
+   </property>
+  </action>
+  <action name="exportFileAction">
+   <property name="text">
+    <string>导出</string>
+   </property>
+  </action>
+  <action name="clearScreenAction">
+   <property name="icon">
+    <iconset resource="mars_resource.qrc">
+     <normaloff>:/icon/clear</normaloff>:/icon/clear</iconset>
+   </property>
+   <property name="text">
+    <string>清除屏幕</string>
+   </property>
+  </action>
+  <action name="serialPortConfigDialogAction">
+   <property name="icon">
+    <iconset resource="mars_resource.qrc">
+     <normaloff>:/icon/settings</normaloff>:/icon/settings</iconset>
+   </property>
+   <property name="text">
+    <string>串口配置</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="mars_resource.qrc"/>
+ </resources>
+ <connections/>
+</ui>

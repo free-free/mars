@@ -41,7 +41,7 @@ private slots:
     //connect  to exporeFileAction's triggered signal
     void onExportFileActionTriggered();
     // error handler
-    void onApplicationError();
+    void onApplicationError(MarsError  error);
 
     /* serial port operation */
     // connect to SPSettingDialog's updated signal

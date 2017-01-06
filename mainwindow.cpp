@@ -14,6 +14,8 @@
 #include <QGridLayout>
 #include <QTimer>
 #include <QDataStream>
+#include <QMessageBox>
+#include <QErrorMessage>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -82,8 +84,9 @@ void MainWindow::initConnections()
     connect(devSerialPort,&MarsSerialPort::disconnected,this,&MainWindow::onSerialPortClosed);
     connect(devSerialPort,&MarsSerialPort::connected,this,&MainWindow::onSerialPortOpened);
     connect(devSerialPort,&MarsSerialPort::dataReady,this,&MainWindow::onSerialPortDataReady);
-    connect(devSerialPort,&MarsSerialPort::connectFailed,this, &MainWindow::onApplicationError);
-    connect(devSerialPort,&MarsSerialPort::connectFailed,this,&MainWindow::onApplicationError);
+    //connect(devSerialPort,&MarsSerialPort::connectFailed,this, &MainWindow::onApplicationError);
+
+    //connect(devSerialPort,&MarsSerialPort::connectFailed,this,&MainWindow::onApplicationError);
 
     connect(serialPortSettingsDialog,&SPSettingsDialog::updated,this,&MainWindow::onSerialPortSettingsUpdated);
     connect(ui->serialPortConfigDialogAction,&QAction::triggered,this,&MainWindow::onSerialPortConfigDialogActionTriggered);
@@ -91,6 +94,7 @@ void MainWindow::initConnections()
 
     connect(ui->consoleWindowBtn,&QPushButton::clicked,this,&MainWindow::onConsoleWindowBtnClicked);
     connect(ui->figureWindowBtn,&QPushButton::clicked,this, &MainWindow::onFigureWindowBtnClicked);
+
 }
 
 /*
@@ -121,9 +125,40 @@ void MainWindow::onSerialPortConfigDialogActionTriggered()
  *@Args: waiting to define
  *@Returns:None
  */
-void MainWindow::onApplicationError()
+void MainWindow::onApplicationError(MarsError  error)
 {
-    /* fuck me ,baby */
+
+    if(error.level==INFO)
+    {
+        QMessageBox::information(this, tr("information"),error.msg);
+    }
+    else if(error.level==DEBUG)
+    {
+
+    }
+    else if(error.level==WARNING)
+    {
+        QMessageBox msgBox(QMessageBox::Warning, tr("warning"),error.msg, 0, this);
+        msgBox.setDetailedText(error.msg);
+        msgBox.addButton(tr("Save &Again"), QMessageBox::AcceptRole);
+        msgBox.addButton(tr("&Continue"), QMessageBox::RejectRole);
+        if (msgBox.exec() == QMessageBox::AcceptRole)
+             return;
+    }
+    else if(error.level==ERROR)
+    {
+        QErrorMessage errorMsg(this);
+        errorMsg.showMessage(error.msg);
+        errorMsg.exec();
+    }
+    else
+    {
+       QMessageBox::StandardButton reply;
+       reply = QMessageBox::critical(this, tr("critical"),
+             error.msg,QMessageBox::Abort | QMessageBox::Ignore);
+       if (reply == QMessageBox::Abort)
+           QApplication::instance()->quit();
+    }
 }
 
 /*
@@ -224,6 +259,7 @@ void MainWindow::renderFigureWindow()
         tick->setInterval(1000);
         tick->start();
         connect(tick,&QTimer::timeout,this,&MainWindow::tickTask);
+        connect(figure,&MarsFigure::error,this,&MainWindow::onApplicationError);
     }
     figure->setHidden(false);
     mainWidgetLayout->addWidget(figure,1,1);

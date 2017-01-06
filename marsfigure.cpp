@@ -668,10 +668,10 @@ void MarsFigure::readFile(const QString &fileName)
         emit error(errorInstance(shortFileName+"打开失败",ERROR));
         return ;
     }
-    // max file size 10M
-    if(file.size()>1024*1024*10)
+    // max file size 20M
+    if(file.size()>1024*1024*20)
     {
-        emit error(errorInstance(shortFileName+"大小已超过10M",ERROR));
+        emit error(errorInstance(shortFileName+"大小已超过20M",ERROR));
         return ;
     }
     QString fileType =shortFileName.split('.').last();

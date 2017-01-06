@@ -44,12 +44,15 @@ public slots:
     void writeXMLFile(QFile * file);
     void readJSONFile(QFile * file);
     void writeJSONFile(QFile* file);
+    void readDatFile(QFile * file);
+    void writeDatFile(QFile * file);
 
     void plot(QList<QByteArray> &data);
     void plot(QByteArray &data);
     void plot(QString & data);
     void plot(double x, double y, int graphId=0, int plotId=0);
-    void plot(QVector<double>& x, QVector<double> &y, int graphId=0,int plotId=0);
+    void plot(QVector<double>& x, QVector<double> &y, int graphId,int plotId);
+    void plot(QVector<double> &x, QVector<double> &y, int graphId);
     void startPlot();
     void stopPlot();
     void clearGraph();

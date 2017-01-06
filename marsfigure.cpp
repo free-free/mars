@@ -156,6 +156,7 @@ QCustomPlot* MarsFigure::createPloter()
     connect(tmpPloter->yAxis, SIGNAL(rangeChanged(QCPRange)), tmpPloter->yAxis2, SLOT(setRange(QCPRange)));
     tmpPloter->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
     ploterContainer->append(tmpPloter);
+    currentPloter = tmpPloter;
     arrangePloter();
     updateStatusBar();
     return tmpPloter;
@@ -173,13 +174,17 @@ void MarsFigure::deletePloter()
         return ;
     ploterContainer->removeAt(ploterContainer->indexOf(currentPloter));
     delete currentPloter;
-
-    currentPloter = ploterContainer->first();
+    currentPloter = ploterContainer->last();
     arrangePloter();
     updateStatusBar();
 
 
 }
+/**
+ *@Desc: update status bar actions when create ploter or delete ploter
+ *@Args: None
+ *@Returns: None
+ */
 void MarsFigure::updateStatusBar()
 {
 
@@ -198,6 +203,7 @@ void MarsFigure::updateStatusBar()
     ploterNameListBox->clear();
     for(int i =0;i<ploterContainer->length();i++)
         ploterNameListBox->addItem("plot "+QString::number(i+1),i);
+    ploterNameListBox->setCurrentIndex(ploterContainer->indexOf(currentPloter));
     connect(ploterNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentPloter(int)));
 
 }
@@ -330,7 +336,7 @@ QColor MarsFigure::graphColor(int graphId)
 }
 
 /**
- *@Desc: fuck you, to plot
+ *@Desc: fuck you, another plotting method
  *@Args: QList<QByteArray> & data
  *@Returns: None
  */
@@ -341,7 +347,7 @@ void MarsFigure::plot(QList<QByteArray> & data)
 }
 
 /**
- *@Desc: fuck you ,
+ *@Desc: fuck you , another plotting method
  *@Args: QByteArray & data
  *@Returns: None
  *
@@ -356,10 +362,10 @@ void MarsFigure::plot(QByteArray & data)
  *@Desc:
  *  plot graph with string data
  *  string data formation:
- *      each data line end with '\n',each data line contains several ';' characters as plot seperator.
- *      The ',' character as seperator for graph data value in each plot
+ *      each data line end with '\n',each data line contains several ' ' characters as a seperator.
+ *
  *      generally speaking, it almost like the following formation:
- *              "x1,y^11,y^12,y^13,y^14;x2,y^21,y^22,y^23,y^24\n"
+ *              "x1 y^11 y^12 y^13"
  *
  *@Args: QString & data
  *@Returns: None
@@ -386,7 +392,6 @@ void MarsFigure::plot(QString &data)
     /*
      * if graph doesn't exist,then create it
      */
-    QRegExp dataParseReg("[\\s]+");
     int dataGraphNumber = dataLines.at(0).split(" ").length()-1;
     int existedGraphNumber = currentPloter->graphCount();
     if(dataGraphNumber>existedGraphNumber)
@@ -442,6 +447,7 @@ void MarsFigure::plot(double x, double y, int graphId,int plotId)
         // recorrent graphId after create new graph in the current ploter
         graphId = ploterContainer->at(plotId)->graphCount()-1;
         ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId)));
+        ploterContainer->at(plotId)->graph(graphId)->rescaleAxes(false);
     }
     ploterContainer->at(plotId)->graph(graphId)->addData(x,y);
     ploterContainer->at(plotId)->xAxis->setRange(x+10,100,Qt::AlignRight);
@@ -460,7 +466,7 @@ void MarsFigure::plot(double x, double y, int graphId,int plotId)
  *  int plotId( max plotId is 3)
  *@Return: None
  */
-void MarsFigure::plot(QVector<double> &x, QVector<double> &y, int graphId, int plotId)
+void MarsFigure::plot(QVector<double> &x, QVector<double> &y, int graphId,int plotId)
 {
 
 
@@ -481,12 +487,36 @@ void MarsFigure::plot(QVector<double> &x, QVector<double> &y, int graphId, int p
         // recorrent graphId after create new graph in the current ploter
         graphId = ploterContainer->at(plotId)->graphCount()-1;
         ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId)));
+        ploterContainer->at(plotId)->graph(graphId)->rescaleAxes(false);
     }
     ploterContainer->at(plotId)->graph(graphId)->setData(x,y); // 65-67 ms /per hundred thousand data
-    ploterContainer->at(plotId)->xAxis->setRange(x.last()-10,100,Qt::AlignRight);
+  //  ploterContainer->at(plotId)->xAxis->setRange(x.last()-10,100,Qt::AlignRight);
     ploterContainer->at(plotId)->replot();
 }
 
+/**
+ *@Desc: another overrid plotting method
+ *@Args: QVector<double> & x,QVector<double> &y, int graphId
+ *@Returns: None
+ */
+void MarsFigure::plot(QVector<double> &x, QVector<double> &y, int graphId)
+{
+
+    /* return back if plotState is false ,it indicate ploting stopped */
+    if (!plotState)
+        return ;
+    if((graphId+1)>currentPloter->graphCount())
+    {
+        currentPloter->addGraph();
+        // recorrent graphId after create new graph in the current ploter
+        graphId = currentPloter->graphCount()-1;
+        currentPloter->graph(graphId)->setPen(QPen(graphColor(graphId)));
+        currentPloter->graph(graphId)->rescaleAxes(false);
+    }
+    currentPloter->graph(graphId)->setData(x,y); // 65-67 ms /per hundred thousand data
+   // currentPloter->xAxis->setRange(x.last()-10,100,Qt::AlignRight);
+    currentPloter->replot();
+}
 
 /**
  *@Desc: return error instance
@@ -552,7 +582,7 @@ void MarsFigure::saveGraph()
 void MarsFigure::showExportDataDialog()
 {
     QString fileName = QFileDialog::getSaveFileName(this,tr("导出数据"),QString(),
-                                                    tr("text files(*.txt);;json files(*.json);; xml files(*.xml)"));
+                                                    tr("text files(*.txt);;json files(*.json);;binary files(*.dat);;xml files(*.xml)"));
     if(fileName.isEmpty())
     {
         emit error(errorInstance(tr("文件名不能为空"),ERROR));
@@ -573,7 +603,7 @@ void MarsFigure::writeFile(const QString &fileName)
     QFile file(fileName);
     if(!file.open(QIODevice::WriteOnly))
     {
-        QString shortFileName = (fileName.split(QRegExp("[/\\]+"))).last();
+        QString shortFileName = (fileName.split(QRegExp("[/\]+"))).last();
         emit error(errorInstance(shortFileName+"打开失败",ERROR));
         return ;
     }
@@ -581,11 +611,15 @@ void MarsFigure::writeFile(const QString &fileName)
     fileType = fileType.toLower();
     try{
 
-        if(fileType=="json")
+        if(fileType == "json")
         {
             writeJSONFile(&file);
         }
-        else if(fileType =="xml")
+        else if(fileType == "dat")
+        {
+            writeDatFile(&file);
+        }
+        else if(fileType == "xml")
         {
             writeXMLFile(&file);
         }
@@ -600,6 +634,7 @@ void MarsFigure::writeFile(const QString &fileName)
         emit error(errorInstance("导出数据失败",ERROR));
     }
 }
+
 /**
  *@Desc: show importing data dialog
  *@Args: None
@@ -608,7 +643,7 @@ void MarsFigure::writeFile(const QString &fileName)
 void MarsFigure::showImportDataDialog()
 {
     QString fileName = QFileDialog::getOpenFileName(this,tr("导入文件"),QString(),
-                                     tr("text files(*.txt);;json files(*.json);;xml files(*.xml)"));
+                                     tr("text files(*.txt);;json files(*.json);;binary files(*.dat);;xml files(*.xml)"));
     if(fileName.isEmpty())
     {
         emit error(errorInstance(tr("文件名不能为空"),ERROR));
@@ -627,26 +662,31 @@ void MarsFigure::showImportDataDialog()
 void MarsFigure::readFile(const QString &fileName)
 {
     QFile file(fileName);
-    QString shortFileName = (fileName.split(QRegExp("[/\\]+"))).last();
+    QString shortFileName = (fileName.split(QRegExp("[/\]+"))).last();
     if(!file.open(QIODevice::ReadOnly))
     {
         emit error(errorInstance(shortFileName+"打开失败",ERROR));
         return ;
     }
-    // max file size 15M
-    if(file.size()>1024*1024*15)
+    // max file size 10M
+    if(file.size()>1024*1024*10)
     {
-        emit error(errorInstance(shortFileName+"大小已超过50M",ERROR));
+        emit error(errorInstance(shortFileName+"大小已超过10M",ERROR));
         return ;
     }
     QString fileType =shortFileName.split('.').last();
     fileType = fileType.toLower();
     try{
-        if(fileType=="json")
+        if(fileType == "json")
         {
+
             readJSONFile(&file);
         }
-        else if(fileType =="xml")
+        else if(fileType == "dat")
+        {
+            readDatFile(&file);
+        }
+        else if(fileType == "xml")
         {
             readXMLFile(&file);
         }
@@ -671,12 +711,10 @@ void MarsFigure::readTextFile(QFile * file)
 {
 
     QTextStream stream(file);
-    qint64 startTime = QDateTime::currentMSecsSinceEpoch();
     QString data = stream.readAll();
     clearGraph();
     startPlot();
     plot(data);
-    qDebug()<<"running time(ms) "<<QDateTime::currentMSecsSinceEpoch()-startTime;
 
 }
 
@@ -691,7 +729,6 @@ void MarsFigure::writeTextFile(QFile * file)
     int graphNumber = currentPloter->graphCount();
     if (graphNumber<=0)
         return ;
-    qint64 startTime=QDateTime::currentMSecsSinceEpoch();
     int dataCount = currentPloter->graph(0)->dataCount();
     for( int j=0;j<dataCount;j++)
     {
@@ -702,7 +739,6 @@ void MarsFigure::writeTextFile(QFile * file)
         }
         out<<"\n";
     }
-    qDebug()<<"saving data running time(ms): "<<QDateTime::currentMSecsSinceEpoch()-startTime;
 }
 
 /**
@@ -714,14 +750,94 @@ void MarsFigure::readJSONFile(QFile *file)
 {
 
 
-    qint64 startTime = QDateTime::currentMSecsSinceEpoch();
     QByteArray saveData=file->readAll();
-    qDebug()<<"read file time(ms): "<<QDateTime::currentMSecsSinceEpoch()-startTime;
-    startTime = QDateTime::currentMSecsSinceEpoch();
     /* load data from json file */
     QJsonDocument document=QJsonDocument::fromJson(saveData);
-    qDebug()<<"load document time(ms): "<<QDateTime::currentMSecsSinceEpoch()-startTime;
-    startTime = QDateTime::currentMSecsSinceEpoch();
+    QJsonArray xArray=document.object().take("x").toArray();
+    QJsonArray yArray=document.object().take("y").toArray();
+    int size = xArray.size();
+    QVector<double> xVector(size);
+    QList<QVector<double> *> yVector;
+    QList<QJsonArray> yArrayList;
+    int graphNumber = yArray.size();
+    /* check y axis value */
+    for(int i=0;i<graphNumber;++i)
+    {
+        yArrayList.append(yArray.at(i).toArray());
+        yVector.append(new QVector<double>(size));
+    }
+    /* convert json array to vector */
+    for(int i=0;i<size;i++)
+    {
+        xVector.append(xArray.at(i).toDouble());
+        for(int j =0;j<graphNumber;j++)
+        {
+            yVector.at(j)->append(yArrayList.at(j).at(i).toDouble());
+        }
+    }
+    /* start ploting data */
+    clearGraph();
+    startPlot();
+
+    for(int i=0;i<graphNumber;i++)
+    {
+        QVector<double> * y = yVector.at(i);
+        plot(xVector,*y,i);
+        delete y;
+    }
+
+}
+
+/**
+ *@Desc: writting graph's data into json file
+ *@Args: QFile * file
+ *@Returns: None
+ */
+void MarsFigure::writeJSONFile(QFile * file)
+{
+    int graphNumber = currentPloter->graphCount();
+    if (graphNumber<=0)
+        return ;
+    QJsonObject data;
+    QJsonArray yValue;
+    QVariantList xValueList;
+    QList<QVariantList*> yValueList;
+    for(int i =0;i<graphNumber;i++)
+    {
+        yValueList.append(new QVariantList);
+    }
+    int dataCount = currentPloter->graph(0)->dataCount();
+    for( int j=0;j<dataCount;j++)
+    {
+        xValueList.append(currentPloter->graph(0)->dataMainKey(j));
+        for(int i =0;i<graphNumber;i++)
+        {
+           yValueList.at(i)->append(currentPloter->graph(i)->dataMainValue(j));
+        }
+    }
+    /* convert y axis value to VariantList */
+    for(int i =0;i<graphNumber;i++)
+    {
+        yValue.append(QJsonArray::fromVariantList(*(yValueList.at(i))));
+        delete yValueList.at(i);
+    }
+    /* convert x axis value variant list to json array*/
+    data["x"]=QJsonArray::fromVariantList(xValueList);
+    data["y"]=yValue;
+    /* writing json document to file */
+    QJsonDocument saveDocument(data);
+    file->write(saveDocument.toJson());
+}
+/**
+ *@Desc: readding dat file and draw data's graph
+ *@Args: QFile * file
+ *@Returns: None
+ */
+void MarsFigure::readDatFile(QFile * file)
+{
+    QByteArray saveData=file->readAll();
+    /* load data from dat file */
+    QJsonDocument document=QJsonDocument::fromBinaryData(saveData);
     QJsonArray xArray=document.object().take("x").toArray();
     QJsonArray yArray=document.object().take("y").toArray();
     int size = xArray.size();
@@ -753,20 +869,17 @@ void MarsFigure::readJSONFile(QFile *file)
         plot(xVector,*y,i);
         delete y;
     }
-    qDebug()<<"parse document time(ms): "<<QDateTime::currentMSecsSinceEpoch()-startTime;
 }
-
 /**
- *@Desc: writting graph's data into json file
+ *@Desc: writting graph's data into dat file
  *@Args: QFile * file
  *@Returns: None
  */
-void MarsFigure::writeJSONFile(QFile * file)
+void MarsFigure::writeDatFile(QFile * file)
 {
     int graphNumber = currentPloter->graphCount();
     if (graphNumber<=0)
         return ;
-    qint64 startTime=QDateTime::currentMSecsSinceEpoch();
     QJsonObject data;
     QJsonArray yValue;
     QVariantList xValueList;
@@ -793,12 +906,10 @@ void MarsFigure::writeJSONFile(QFile * file)
     /* convert x axis value variant list to json array*/
     data["x"]=QJsonArray::fromVariantList(xValueList);
     data["y"]=yValue;
-    /* writing json document to file */
+    /* writing json document to binary file */
     QJsonDocument saveDocument(data);
-    file->write(saveDocument.toJson());
-    qDebug()<<"saving data running time(ms): "<<QDateTime::currentMSecsSinceEpoch()-startTime;
+    file->write(saveDocument.toBinaryData());
 }
-
 /**
  *@Desc: reading xml file and draw data's graph
  *@Args: QFile * file

@@ -42,6 +42,11 @@
     <property name="spacing">
      <number>0</number>
     </property>
+    <item row="0" column="1">
+     <widget class="QWidget" name="mainWidget" native="true">
+      <zorder>groupBox</zorder>
+     </widget>
+    </item>
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox">
       <property name="sizePolicy">
@@ -231,9 +236,6 @@ border-bottom:1px solid #333;</string>
       </widget>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QWidget" name="mainWidget" native="true"/>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -277,6 +279,10 @@ QMenuBar::item:pressed {
      <property name="title">
       <string>连接协议</string>
      </property>
+     <property name="icon">
+      <iconset resource="mars_resource.qrc">
+       <normaloff>:/icon/connect-protocol</normaloff>:/icon/connect-protocol</iconset>
+     </property>
      <addaction name="serialPortProtocolDialogAction"/>
     </widget>
     <addaction name="protocolDescription"/>
@@ -287,7 +293,9 @@ QMenuBar::item:pressed {
      <string>工具</string>
     </property>
     <addaction name="clearScreenAction"/>
-    <addaction name="exportFileAction"/>
+    <addaction name="exportAction"/>
+    <addaction name="importAction"/>
+    <addaction name="saveGraphAction"/>
    </widget>
    <widget class="QMenu" name="configurationsMenu">
     <property name="title">
@@ -358,9 +366,16 @@ QMenuBar::item:pressed {
     <string> 关于</string>
    </property>
   </action>
-  <action name="exportFileAction">
+  <action name="exportAction">
+   <property name="icon">
+    <iconset resource="mars_resource.qrc">
+     <normaloff>:/icon/export</normaloff>:/icon/export</iconset>
+   </property>
    <property name="text">
-    <string>导出</string>
+    <string>导出数据</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
   <action name="clearScreenAction">
@@ -371,6 +386,9 @@ QMenuBar::item:pressed {
    <property name="text">
     <string>清除屏幕</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
   </action>
   <action name="serialPortConfigDialogAction">
    <property name="icon">
@@ -379,6 +397,33 @@ QMenuBar::item:pressed {
    </property>
    <property name="text">
     <string>串口配置</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="importAction">
+   <property name="icon">
+    <iconset resource="mars_resource.qrc">
+     <normaloff>:/icon/import</normaloff>:/icon/import</iconset>
+   </property>
+   <property name="text">
+    <string>导入数据</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="saveGraphAction">
+   <property name="icon">
+    <iconset resource="mars_resource.qrc">
+     <normaloff>:/icon/graph</normaloff>:/icon/graph</iconset>
+   </property>
+   <property name="text">
+    <string>保存图像</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

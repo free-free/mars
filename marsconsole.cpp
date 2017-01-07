@@ -6,6 +6,9 @@
 #include <QDebug>
 #include <QList>
 #include <QToolBar>
+#include <QVBoxLayout>
+#include <QComboBox>
+#include <QTimer>
 
 /**
  *@Desc: init gridlayout ,tool bar and command line
@@ -16,15 +19,32 @@ MarsConsole::MarsConsole(QWidget *parent,bool viewOnly,int maxIBufferSize,int ma
 {    
 
 
-    layout = new QGridLayout(this);
+    layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
     this->setLayout(layout);
     // note!!!: initToolBar() must be called before createCommandLine(*);
     initToolBar();
-    createCommandLine(1,viewOnly,maxIBufferSize,maxOBufferSize);
-
+    initCmdLine(viewOnly,maxIBufferSize,maxOBufferSize);
+    connect(this,&MarsConsole::getImportFileName,this,&MarsConsole::readFile);
+    connect(this,&MarsConsole::getExportFileName,this,&MarsConsole::writeFile);
 }
+/**
+ *@Desc: delete created command line instance and layout
+ *@Args: None
+ *@Returns: None
+ */
+MarsConsole::~MarsConsole()
+{
+    for(int i=0;i<cmdLineContainer->size();++i)
+    {
+        delete (cmdLineContainer->at(i));
+    }
+    delete cmdLineNameListBox;
+    delete cmdLineLayout;
+    delete layout;
+}
+
 
 
 /**
@@ -48,85 +68,199 @@ void MarsConsole::initToolBar()
     toolBar->setFixedHeight(30);
     toolBar->setContentsMargins(0,0,0,0);
     toolBar->setOrientation(Qt::Horizontal);
+    toolBar->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
     exportDataAction = new QAction(QIcon(":/icon/export"),tr("导出数据"),this);
     importDataAction = new QAction(QIcon(":/icon/import"),tr("导入数据"),this);
+    cmdLineNameListBox =new QComboBox(this);
+    cmdLineNameListBox->setStyleSheet("QComboBox{"
+                             "padding:0px 10px 0px 10px;"
+                             "margin:0px 0px 0px 0px;"
+                             "border:0px 0px 0px 0px;"
+                             "min-width: 6em;"
+                             "color:#efefef;"
+                         "}"
+                         "QComboBox::drop-down {"
+                             "subcontrol-origin: padding;"
+                             "subcontrol-position: top right;"
+                             "width:20px;"
+                             "border-left-width: 0px;"
+                             "}"
+                         "QComboBox::down-arrow {"
+                            "image: url(:/icon/tiny-down-arrow);"
+                         "}"
+                         "QComboBox::hover{"
+                            "background-color:#888;"
+                         "}"
+                         );
+    toolBar->addSeparator();
+    toolBar->addWidget(cmdLineNameListBox);
     toolBar->addAction(exportDataAction);
     toolBar->addAction(importDataAction);
-    connect(exportDataAction,&QAction::triggered,this,&MarsConsole::exportData);
-    connect(importDataAction,&QAction::triggered,this,&MarsConsole::importData);
-    layout->addWidget(toolBar,1,1);
+    connect(exportDataAction,&QAction::triggered,this,&MarsConsole::showExportDataDialog);
+    connect(importDataAction,&QAction::triggered,this,&MarsConsole::showImportDataDialog);
+    connect(cmdLineNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentCmdLine(int)));
+    layout->addWidget(toolBar);
+}
+
+void MarsConsole::initCmdLine(bool viewOnly,int maxIBufferSize,int maxOBufferSize)
+{
+    cmdLineLayout = new QGridLayout();
+    layout->addLayout(cmdLineLayout);
+    cmdLineContainer = new QList<MarsCommandLine*>();
+    currentCmdLine = createCmdLine(viewOnly,maxIBufferSize,maxOBufferSize);
 }
 
 /**
- *@Desc: create command line,when create successfully return true otherwise return false
- *@Args: int(command line number), bool(view only), int (command line max input buffer size)
+ *@Desc: create command line,when create successfully return created command line , NULl otherwise
+ *@Args:  bool(view only), int (command line max input buffer size)
  * , int(command line max output buffer size)
- *@Returns: bool
+ *@Returns:MarsCommandLine *
  */
-bool MarsConsole::createCommandLine(int number,bool viewOnly,int maxIBufferSize, int maxOBufferSize)
+MarsCommandLine* MarsConsole::createCmdLine(bool viewOnly,int maxIBufferSize, int maxOBufferSize)
 {
 
     MarsCommandLine * tmpCmdLine;
-    for(int i=0;i<number;++i)
-    {
-        if(commandLines.size()>=4)
-            break;
-        tmpCmdLine = new MarsCommandLine(this,viewOnly, maxIBufferSize, maxOBufferSize);
-        connect(tmpCmdLine,&MarsCommandLine::dataExportRequest,this,&MarsConsole::exportData);
-        connect(tmpCmdLine,&MarsCommandLine::dataImportRequest,this,&MarsConsole::importData);
-        connect(tmpCmdLine,&MarsCommandLine::dataIn,this,&MarsConsole::onCommandLineDataReady);
-        commandLines.append(tmpCmdLine);
-    }
-    switch(commandLines.size())
-    {
-    case 1:
-        layout->addWidget(commandLines.at(0),2,1);
-        break;
-    case 2:
-        layout->addWidget(commandLines.at(0),2,1);
-        layout->addWidget(commandLines.at(1),2,2);
-        commandLine(0).style()->addStyleSheet("border-right:1px solid #666;");
-        commandLine(1).style()->addStyleSheet("border-left:1px solid #666;");
-        break;
-    case 3:
-        layout->addWidget(commandLines.at(0),2,1);
-        layout->addWidget(commandLines.at(1),2,2);
-        layout->addWidget(commandLines.at(2),3,1,1,2);
-        commandLine(0).style()->addStyleSheet("border-right:1px solid #666;border-bottom:1px solid #666;");
-        commandLine(1).style()->addStyleSheet("border-left:1px solid #666;border-bottom:1px solid #666;");
-        commandLine(2).style()->addStyleSheet("border-top:1px solid #666;");
-        break;
-    case 4:
-        layout->addWidget(commandLines.at(0),2,1);
-        layout->addWidget(commandLines.at(1),2,2);
-        layout->addWidget(commandLines.at(2),3,1);
-        layout->addWidget(commandLines.at(3),3,2);
-        commandLine(0).style()->addStyleSheet("border-right:1px solid #666;border-bottom:1px solid #666;");
-        commandLine(1).style()->addStyleSheet("border-left:1px solid #666;border-bottom:1px solid #666;");
-        commandLine(2).style()->addStyleSheet("border-right:1px solid #666;border-top:1px solid #666;");
-        commandLine(3).style()->addStyleSheet("border-left:1px solid #666;border-top:1px solid #666;");
-        break;
-    }
-    if(commandLines.size()>0)
-    {
-        if(viewOnly)
-            importDataAction->setEnabled(false);
-    }
-    return true;
+    if(cmdLineContainer->size()>=MAX_CMDLINE_NUMBER)
+       return NULL;
+    tmpCmdLine = new MarsCommandLine(this,viewOnly, maxIBufferSize, maxOBufferSize);
+    connect(tmpCmdLine,&MarsCommandLine::dataExportRequest,this,&MarsConsole::showExportDataDialog);
+    connect(tmpCmdLine,&MarsCommandLine::dataImportRequest,this,&MarsConsole::showImportDataDialog);
+    connect(tmpCmdLine,&MarsCommandLine::dataIn,this,&MarsConsole::onCmdLineDataReady);
+    connect(tmpCmdLine,&MarsCommandLine::focusIn,this,&MarsConsole::onCmdLineFocusIn);
+    cmdLineContainer->append(tmpCmdLine);
+    currentCmdLine = tmpCmdLine;
+    arrangeCommandLine();
+    updateStatusBar();
+    return tmpCmdLine;
 }
-
 /**
- *@Desc: delete created command line instance and layout
+ *@Desc: delete current command line
  *@Args: None
  *@Returns: None
  */
-MarsConsole::~MarsConsole()
+void MarsConsole::deleteCurrentCmdLine()
 {
-    for(int i=0;i<commandLines.size();++i)
+    deleteCmdLine(cmdLineContainer->indexOf(currentCmdLine));
+}
+
+/**
+ *@Desc: delete command line with specific id
+ *@Args: int index
+ *@Returns: None
+ */
+void MarsConsole::deleteCmdLine(int index)
+{
+    MarsCommandLine * tmpCmdLine;
+    int currentCmdLineIndex = 0;
+    if(cmdLineContainer->length()<=1)
+        return ;
+    tmpCmdLine=cmdLineContainer->at(index);
+    currentCmdLineIndex = cmdLineContainer->indexOf(currentCmdLine);
+    cmdLineContainer->removeAt(index);
+    delete tmpCmdLine;
+    if(index == currentCmdLineIndex)
+        currentCmdLine = cmdLineContainer->last();
+    arrangeCommandLine();
+    updateStatusBar();
+
+}
+
+/**
+ *@Desc: update status bar when creating or deleting command line
+ *@Args: None
+ *@Returns: None
+ */
+void MarsConsole::updateStatusBar()
+{
+    disconnect(cmdLineNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentCmdLine(int)));
+    cmdLineNameListBox->clear();
+    for(int i=0;i<cmdLineContainer->length();i++)
     {
-        delete (commandLines.at(i));
+        cmdLineNameListBox->addItem("command line "+QString::number(i+1),i);
     }
-    delete layout;
+    cmdLineNameListBox->setCurrentIndex(cmdLineContainer->indexOf(currentCmdLine));
+    connect(cmdLineNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentCmdLine(int)));
+    if(currentCmdLine->isReadOnly())
+        importDataAction->setEnabled(false);
+    else
+        importDataAction->setEnabled(true);
+}
+
+/**
+ *@Desc: change current command line pointer
+ *@Args: int index
+ *@Returns: None
+ */
+
+void MarsConsole::changeCurrentCmdLine(int index)
+{
+    currentCmdLine = cmdLineContainer->at(index);
+    if(currentCmdLine->isReadOnly())
+        importDataAction->setEnabled(false);
+    else
+        importDataAction->setEnabled(true);
+
+}
+/**
+ *@Desc: clear current command line buffer and screen
+ *@Args:  None
+ *@Returns: None
+ */
+void MarsConsole::clearCurrentCmdLine()
+{
+    currentCmdLine->clearAll();
+}
+/**
+ *@Desc: slot method for MarsCommandLine's focusIn signal
+ *@Args: MarsCommandLine * focusInObj
+ *@Returns: None
+ */
+void MarsConsole::onCmdLineFocusIn(MarsCommandLine * focusInObj)
+{
+    int focusInObjIndex = cmdLineContainer->indexOf(focusInObj);
+    changeCurrentCmdLine(focusInObjIndex);
+    disconnect(cmdLineNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentCmdLine(int)));
+    cmdLineNameListBox->setCurrentIndex(focusInObjIndex);
+    connect(cmdLineNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentCmdLine(int)));
+
+}
+/**
+ *@Desc: layout command line in console window
+ *@Args: None
+ *@Returns: None
+ */
+void MarsConsole::arrangeCommandLine()
+{
+    switch(cmdLineContainer->size())
+    {
+    case 1:
+        cmdLineLayout->addWidget(cmdLineContainer->at(0),1,1);
+        break;
+    case 2:
+        cmdLineLayout->addWidget(cmdLineContainer->at(0),1,1);
+        cmdLineLayout->addWidget(cmdLineContainer->at(1),1,2);
+        commandLine(0)->style()->addStyleSheet("border-right:1px solid #666;");
+        commandLine(1)->style()->addStyleSheet("border-left:1px solid #666;");
+        break;
+    case 3:
+        cmdLineLayout->addWidget(cmdLineContainer->at(0),1,1,1,2);
+        cmdLineLayout->addWidget(cmdLineContainer->at(1),2,1);
+        cmdLineLayout->addWidget(cmdLineContainer->at(2),2,2);
+        commandLine(0)->style()->addStyleSheet("border-right:1px solid #666;border-bottom:1px solid #666;");
+        commandLine(1)->style()->addStyleSheet("border-left:1px solid #666;border-bottom:1px solid #666;");
+        commandLine(2)->style()->addStyleSheet("border-top:1px solid #666;");
+        break;
+    case 4:
+        cmdLineLayout->addWidget(cmdLineContainer->at(0),1,1);
+        cmdLineLayout->addWidget(cmdLineContainer->at(1),1,2);
+        cmdLineLayout->addWidget(cmdLineContainer->at(2),2,1);
+        cmdLineLayout->addWidget(cmdLineContainer->at(3),2,2);
+        commandLine(0)->style()->addStyleSheet("border-right:1px solid #666;border-bottom:1px solid #666;");
+        commandLine(1)->style()->addStyleSheet("border-left:1px solid #666;border-bottom:1px solid #666;");
+        commandLine(2)->style()->addStyleSheet("border-right:1px solid #666;border-top:1px solid #666;");
+        commandLine(3)->style()->addStyleSheet("border-left:1px solid #666;border-top:1px solid #666;");
+        break;
+    }
 }
 
 /**
@@ -134,24 +268,20 @@ MarsConsole::~MarsConsole()
  *@Args: int( command line instance index)
  *@Return: MarsCommandLine &
  */
-MarsCommandLine & MarsConsole::commandLine(int index)
+MarsCommandLine * MarsConsole::commandLine(int index)
 {
-    if(commandLines.size()==0)
-    {
-        createCommandLine(1);
-        return *(commandLines.at(0));
-    }
-    if(commandLines.size()<(index-1))
-        return *(commandLines.last());
-    return *(commandLines.at(index));
+    if(cmdLineContainer->size()==0)
+        return NULL;
+    if(cmdLineContainer->size()<(index-1))
+        return cmdLineContainer->last();
+    return cmdLineContainer->at(index);
 }
-
 /**
  *@Desc: slot function for command line input data ready signal
  *@Args: None
  *@Returns: None
  */
-void MarsConsole::onCommandLineDataReady()
+void MarsConsole::onCmdLineDataReady()
 {
     emit dataReady();
 }
@@ -161,29 +291,46 @@ void MarsConsole::onCommandLineDataReady()
  *@Args: None
  *@Returns: None
  */
-void MarsConsole::exportData()
+void MarsConsole::showExportDataDialog()
 {
-    QString fullFileName = QFileDialog::getSaveFileName(this,tr("保存为....."),QString(),
-                                                    tr("text files(*.txt);;json files(*.json);; xml files(*.xml)"));
-    if(fullFileName.isEmpty())
+    QString fileName = QFileDialog::getSaveFileName(this,tr("保存为....."),QString(),
+                                                    tr("text files(*.txt);;json files(*.json);;binary files(*.dat);; xml files(*.xml)"));
+    if(fileName.isEmpty())
     {
-        emit error(errorInstance(tr("文件名不能为空"),ERROR));
+        emit errors(errorInstance(tr("文件名不能为空"),ERROR));
         return ;
     }
-    QFile file(fullFileName);
+    QTimer::singleShot(10,[=](){
+        emit getExportFileName(fileName);
+    });
+
+}
+
+/**
+ *@Desc:  writting console output buffer's data into file
+ *@Args: QString file name
+ *@Returns: None
+ */
+void MarsConsole::writeFile(QString fileName)
+{
+    QFile file(fileName);
     if(!file.open(QIODevice::WriteOnly))
     {
-        QString shortFileName = (fullFileName.split(QRegExp("[/\\]+"))).last();
-        emit error(errorInstance(shortFileName+"打开失败",ERROR));
+        QString shortFileName = (fileName.split(QRegExp("[/\\]+"))).last();
+        emit errors(errorInstance(shortFileName+"打开失败",ERROR));
         return ;
     }
-    QString fileType =fullFileName.split('.').last();
+    QString fileType =fileName.split('.').last();
     fileType = fileType.toLower();
     try{
 
         if(fileType=="json")
         {
             writeJSONFile(&file);
+        }
+        else if(fileType =="dat")
+        {
+            writeDatFile(&file);
         }
         else if(fileType =="xml")
         {
@@ -198,50 +345,45 @@ void MarsConsole::exportData()
     {
         file.close();
     }
-
-
 }
-/**
- *@Desc: return error instance
- *@Args:  QString ,MarsErrorLevel
- *@Returns: MarsError
- */
-MarsError MarsConsole::errorInstance(QString msg, MarsErrorLevel level)
-{
-    MarsError error;
-    error.datetime = QDateTime::currentDateTime();
-    error.type = CONSOLE;
-    error.msg = msg;
-    error.level = level;
-    return error;
-}
-
 /**
  *@Desc: slot function for loading file data into command line input buffer
  *@Args: None
  *@Returns: None
  */
-void MarsConsole::importData()
+void MarsConsole::showImportDataDialog()
 {
-    QString fullFileName = QFileDialog::getOpenFileName(this,tr("导入文件"),QString(),
-                                     tr("text files(*.txt);;json files(*.json);; xml files(*.xml)"));
-    if(fullFileName.isEmpty())
+    QString fileName = QFileDialog::getOpenFileName(this,tr("导入文件"),QString(),
+                                     tr("text files(*.txt);;json files(*.json);; binary files(*.dat);; xml files(*.xml)"));
+    if(fileName.isEmpty())
     {
-
-        emit error(errorInstance(tr("文件名不能为空"),ERROR));
+        emit errors(errorInstance(tr("文件名不能为空"),WARNING));
         return ;
     }
-    QFile file(fullFileName);
-    QString shortFileName = (fullFileName.split(QRegExp("[/\\]+"))).last();
+    QTimer::singleShot(5,[=](){
+       emit getImportFileName(fileName);
+    });
+}
+
+/**
+ *@Desc: reading data from file and import data into console input buffer
+ *@Args: QString file name
+ *@Returns: None
+ */
+
+void MarsConsole::readFile(QString fileName)
+{
+    QFile file(fileName);
+    QString shortFileName = (fileName.split(QRegExp("[/\\]+"))).last();
     if(!file.open(QIODevice::ReadOnly))
     {
-        emit error(errorInstance(shortFileName+"打开失败",ERROR));
+        emit errors(errorInstance(shortFileName+"打开失败",WARNING));
         return ;
     }
-    // max file size 50M
-    if(file.size()>1024*1024*50)
+    // max file size 20M
+    if(file.size()>1024*1024*20)
     {
-        emit error(errorInstance(shortFileName+"大小已超过50M",ERROR));
+        emit errors(errorInstance(shortFileName+"大小已超过20M",WARNING));
         return ;
     }
     QString fileType =shortFileName.split('.').last();
@@ -251,6 +393,10 @@ void MarsConsole::importData()
         if(fileType=="json")
         {
             readJSONFile(&file);
+        }
+        else if(fileType == "dat")
+        {
+            readDatFile(&file);
         }
         else if(fileType =="xml")
         {
@@ -275,7 +421,8 @@ void MarsConsole::importData()
 void MarsConsole::readTextFile(QFile * file)
 {
     QTextStream stream(file);
-    commandLine(0)<<stream;
+    qDebug()<<"focus widget";
+    *currentCmdLine<<stream;
 }
 
 /**
@@ -286,7 +433,7 @@ void MarsConsole::readTextFile(QFile * file)
 void MarsConsole::writeTextFile(QFile * file)
 {
     QTextStream stream(file);
-    stream<<commandLine(0).outputBufferText();
+    stream<<currentCmdLine->outputBufferText();
 }
 
 /**
@@ -309,6 +456,15 @@ void MarsConsole::writeJSONFile(QFile * file)
 
 }
 
+void MarsConsole::readDatFile(QFile *file)
+{
+
+}
+
+void MarsConsole::writeDatFile(QFile *file)
+{
+
+}
 /**
  *@Desc: read xml file and import data into input buffer
  *@Args: QFile * file
@@ -327,4 +483,19 @@ void MarsConsole::readXMLFile(QFile * file)
 void MarsConsole::writeXMLFile(QFile * file)
 {
 
+}
+
+/**
+ *@Desc: return error instance
+ *@Args:  QString ,MarsErrorLevel
+ *@Returns: MarsError
+ */
+MarsError MarsConsole::errorInstance(QString msg, MarsErrorLevel level)
+{
+    MarsError error;
+    error.datetime = QDateTime::currentDateTime();
+    error.type = CONSOLE;
+    error.msg = msg;
+    error.level = level;
+    return error;
 }

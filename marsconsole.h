@@ -9,6 +9,9 @@ class QFile;
 class QGridLayout;
 class QList<MarsCommandLine>;
 class QToolBar;
+class QComboBox;
+class QVBoxLayout;
+class QFocusEvent;
 
 class MarsConsole : public QWidget
 {
@@ -16,33 +19,55 @@ class MarsConsole : public QWidget
 public:
     explicit MarsConsole(QWidget *parent = 0,bool view_only=false,int maxIBufferSize=500,int maxOBufferSize=1000);
     ~MarsConsole();
-    MarsCommandLine & commandLine(int index = 0);
-     MarsError  errorInstance(QString msg, MarsErrorLevel level);
+    MarsCommandLine * commandLine(int index = 0);
+    MarsError  errorInstance(QString msg, MarsErrorLevel level);
 
 signals:
-    void error(MarsError  error);
+    void errors(MarsError  error);
     void dataReady();
+    void getImportFileName(QString fileName);
+    void getExportFileName(QString fileName);
 
 
 public slots:
-    void exportData();
-    void importData();
+    void showExportDataDialog();
+    void showImportDataDialog();
+    void readFile(QString fileName);
+    void writeFile(QString fileName);
     void readTextFile(QFile * file);
     void writeTextFile(QFile *file);
     void readXMLFile(QFile * file);
     void writeXMLFile(QFile * file);
     void readJSONFile(QFile * file);
     void writeJSONFile(QFile* file);
-    void onCommandLineDataReady();
-    bool createCommandLine(int number,bool viewOnly=false,int maxIBufferSize=500, int maxOBufferSize=1000);
-    void initToolBar();
+    void readDatFile(QFile * file);
+    void writeDatFile(QFile * file);
+    void deleteCurrentCmdLine();
+    void deleteCmdLine(int index);
+    void changeCurrentCmdLine(int index);
+    MarsCommandLine* createCmdLine(bool viewOnly=false,int maxIBufferSize=500, int maxOBufferSize=1000);
+    void clearCurrentCmdLine();
+    void onCmdLineDataReady();
+    void onCmdLineFocusIn(MarsCommandLine * focusInObj);
+
+
+
 private:
-    QList<MarsCommandLine*> commandLines;
-    QGridLayout * layout;
+    void updateStatusBar();
+    void initToolBar();
+    void initCmdLine(bool viewOnly,int maxIBufferSize,int maxOBufferSize);
+    void arrangeCommandLine();
+
+private:
+    const int MAX_CMDLINE_NUMBER=4;
+    QList<MarsCommandLine*> *cmdLineContainer;
+    MarsCommandLine * currentCmdLine;
+    QGridLayout * cmdLineLayout;
+    QVBoxLayout * layout;
     QToolBar * toolBar;
     QAction * exportDataAction;
     QAction * importDataAction;
-
+    QComboBox * cmdLineNameListBox;
 
 };
 

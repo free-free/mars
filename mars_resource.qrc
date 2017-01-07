@@ -14,5 +14,6 @@
         <file alias="tiny-down-arrow">resources/icon/tiny-down-arrow.png</file>
         <file alias="delete-plot">resources/icon/delete-plot.png</file>
         <file alias="create-plot">resources/icon/create-plot.png</file>
+        <file alias="connect-protocol">resources/icon/connect-protocol.png</file>
     </qresource>
 </RCC>

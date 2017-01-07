@@ -28,8 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     serialPortSettingsDialog = new SPSettingsDialog(this);
     devSerialPort = new MarsSerialPort(serialPortSettingsDialog->settings(),this);
     ui->mainWidget->setLayout(mainWidgetLayout);
-    inConsole=NULL;
-    outConsole=NULL;
+    console = NULL;
     figure = NULL;
     renderConsoleWindow();
     initConnections();
@@ -83,10 +82,8 @@ void MainWindow::initConnections()
     connect(ui->disconnectSPAction,&QAction::triggered,devSerialPort,&MarsSerialPort::disconnect);
     connect(devSerialPort,&MarsSerialPort::disconnected,this,&MainWindow::onSerialPortClosed);
     connect(devSerialPort,&MarsSerialPort::connected,this,&MainWindow::onSerialPortOpened);
-    connect(devSerialPort,&MarsSerialPort::dataReady,this,&MainWindow::onSerialPortDataReady);
-    //connect(devSerialPort,&MarsSerialPort::connectFailed,this, &MainWindow::onApplicationError);
-
-    //connect(devSerialPort,&MarsSerialPort::connectFailed,this,&MainWindow::onApplicationError);
+    connect(devSerialPort,&MarsSerialPort::readyRead,this,&MainWindow::onSerialPortDataReady);
+    connect(devSerialPort,&MarsSerialPort::errors,this,&MainWindow::onApplicationError);
 
     connect(serialPortSettingsDialog,&SPSettingsDialog::updated,this,&MainWindow::onSerialPortSettingsUpdated);
     connect(ui->serialPortConfigDialogAction,&QAction::triggered,this,&MainWindow::onSerialPortConfigDialogActionTriggered);
@@ -140,9 +137,8 @@ void MainWindow::onApplicationError(MarsError  error)
     {
         QMessageBox msgBox(QMessageBox::Warning, tr("warning"),error.msg, 0, this);
         msgBox.setDetailedText(error.msg);
-        msgBox.addButton(tr("Save &Again"), QMessageBox::AcceptRole);
         msgBox.addButton(tr("&Continue"), QMessageBox::RejectRole);
-        if (msgBox.exec() == QMessageBox::AcceptRole)
+        if (msgBox.exec() == QMessageBox::RejectRole)
              return;
     }
     else if(error.level==ERROR)
@@ -194,8 +190,6 @@ void MainWindow::onSerialPortClosed()
     ui->serialPortConfigDialogAction->setEnabled(true);
     ui->connectSPAction->setEnabled(true);
     ui->disconnectSPAction->setEnabled(false);
-
-
 }
 
 
@@ -233,18 +227,18 @@ void MainWindow::onFigureWindowBtnClicked()
 
 void MainWindow::renderConsoleWindow()
 {
-    if(!outConsole)
-        outConsole = new MarsConsole(ui->mainWidget,true);
-    if(!inConsole)
-        inConsole = new MarsConsole(ui->mainWidget);
-    inConsole->commandLine(0).style()->addStyleSheet("border-right:1px solid #666;");
-    outConsole->commandLine(0).style()->addStyleSheet("border-left:1px solid #666;");
-    inConsole->setHidden(false);
-    outConsole->setHidden(false);
-    mainWidgetLayout->addWidget(inConsole,1,1);
-    mainWidgetLayout->addWidget(outConsole,1,2);
-    connect(inConsole,&MarsConsole::dataReady,this,&MainWindow::onConsoleDataReady);
+
+    if(!console)
+    {
+        console = new MarsConsole(ui->mainWidget);
+        console->createCmdLine(true);
+        connect(console->commandLine(0),&MarsCommandLine::dataIn,this,&MainWindow::onConsoleDataReady);
+        connect(console,&MarsConsole::errors,this,&MainWindow::onApplicationError);
+    }
+    console->setHidden(false);
+    mainWidgetLayout->addWidget(console,1,1);
     currentWindowId = 0;
+    updateMenuBar(currentWindowId);
 
 }
 
@@ -260,18 +254,20 @@ void MainWindow::renderFigureWindow()
         tick->start();
         connect(tick,&QTimer::timeout,this,&MainWindow::tickTask);
         connect(figure,&MarsFigure::error,this,&MainWindow::onApplicationError);
+        connect(ui->saveGraphAction,&QAction::triggered,figure,&MarsFigure::saveGraph);
+
     }
     figure->setHidden(false);
     mainWidgetLayout->addWidget(figure,1,1);
     currentWindowId = 1;
-
+    updateMenuBar(currentWindowId);
 }
 
 
 
 void MainWindow::onConsoleDataReady()
 {
-    (inConsole->commandLine(0))>>(outConsole->commandLine(0));
+    *(console->commandLine(0))>>*(console->commandLine(1));
 }
 
 void MainWindow::tickTask()
@@ -298,6 +294,38 @@ void MainWindow::tickTask()
     lastX++;
 
 }
+void MainWindow::updateMenuBar(int winId)
+{
+    switch(winId)
+    {
+        case 0:
+            ui->saveGraphAction->setEnabled(false);
+            connect(ui->exportAction,&QAction::triggered,console,&MarsConsole::showExportDataDialog);
+            connect(ui->importAction,&QAction::triggered,console,&MarsConsole::showImportDataDialog);
+            connect(ui->clearScreenAction,&QAction::triggered,console,&MarsConsole::clearCurrentCmdLine);
+            if(figure)
+            {
+                disconnect(ui->clearScreenAction,&QAction::triggered,figure,&MarsFigure::clearCurrentPlot);
+                disconnect(ui->importAction,&QAction::triggered,figure,&MarsFigure::showImportDataDialog);
+                disconnect(ui->exportAction,&QAction::triggered,figure,&MarsFigure::showExportDataDialog);
+            }
+            break;
+        case 1:
+            ui->saveGraphAction->setEnabled(true);
+            connect(ui->importAction,&QAction::triggered,figure,&MarsFigure::showImportDataDialog);
+            connect(ui->exportAction,&QAction::triggered,figure,&MarsFigure::showExportDataDialog);
+            connect(ui->clearScreenAction,&QAction::triggered,figure,&MarsFigure::clearCurrentPlot);
+            if(console)
+            {
+                disconnect(ui->clearScreenAction,&QAction::triggered,console,&MarsConsole::clearCurrentCmdLine);
+                disconnect(ui->exportAction,&QAction::triggered,console,&MarsConsole::showExportDataDialog);
+                disconnect(ui->importAction,&QAction::triggered,console,&MarsConsole::showImportDataDialog);
+            }
+            break;
+        default:
+            break;
+    }
+}
 
 void MainWindow::beforeSwitchWindow()
 {
@@ -306,10 +334,8 @@ void MainWindow::beforeSwitchWindow()
     {
         // remove console window from layout and hide it
         case 0:
-            mainWidgetLayout->removeWidget(inConsole);
-            mainWidgetLayout->removeWidget(outConsole);
-            inConsole->setHidden(true);
-            outConsole->setHidden(true);
+            mainWidgetLayout->removeWidget(console);
+            console->setHidden(true);
             break;
         // remove figure window from layout and hide it
         case 1:
@@ -340,6 +366,7 @@ void MainWindow::switchWindow(int windowId)
             renderConsoleWindow();
             break;
     }
+
 }
 
 

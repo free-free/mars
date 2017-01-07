@@ -68,6 +68,7 @@ public:
     void renderConsoleWindow();
     void renderFigureWindow();
     void switchWindow(int windowId);
+    void updateMenuBar(int winId);
     void tickTask();
 private:
 
@@ -77,9 +78,8 @@ private:
     Ui::MainWindow *ui;
     MarsSerialPort * devSerialPort;
     SPSettingsDialog * serialPortSettingsDialog;
-    MarsConsole * outConsole;
-    MarsConsole * inConsole;
-    MarsFigure * figure;
+    MarsConsole * console;
+    MarsFigure *  figure;
     QGridLayout * mainWidgetLayout;
     int currentWindowId;
     QTimer *tick;

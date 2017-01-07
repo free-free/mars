@@ -32,8 +32,8 @@ MarsFigure::~MarsFigure()
     delete exportDataAction;
     delete importDataAction;
     delete plotAction;
-    delete saveGraphAction;
-    delete clearGraphAction;
+    delete savePlotAction;
+    delete clearPlotAction;
     delete deletePloterAction;
     delete createPloterAction;
     delete ploterContainer;
@@ -66,10 +66,10 @@ void MarsFigure::initToolBar()
     toolBar->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
     plotAction = new QAction(QIcon(":/icon/start"),tr("开始绘制"),this);
     createPloterAction = new QAction(QIcon(":/icon/create-plot"),tr("新建图像"),this);
-    saveGraphAction = new QAction(QIcon(":/icon/save"),tr("保存图像"),this);
+    savePlotAction = new QAction(QIcon(":/icon/save"),tr("保存图像"),this);
     exportDataAction = new QAction(QIcon(":/icon/export"),tr("导出数据"),this);
     importDataAction = new QAction(QIcon(":/icon/import"),tr("导入数据"),this);
-    clearGraphAction = new QAction(QIcon(":/icon/clear"),tr("清除图像"),this);
+    clearPlotAction = new QAction(QIcon(":/icon/clear"),tr("清除图像"),this);
     deletePloterAction = new QAction(QIcon(":/icon/delete-plot"),tr("删除图像"),this);
     ploterNameListBox =new QComboBox(this);
     ploterNameListBox->setStyleSheet("QComboBox{"
@@ -97,16 +97,16 @@ void MarsFigure::initToolBar()
     toolBar->addAction(createPloterAction);
     toolBar->addSeparator();
     toolBar->addWidget(ploterNameListBox);
-    toolBar->addAction(saveGraphAction);
+    toolBar->addAction(savePlotAction);
     toolBar->addAction(exportDataAction);
     toolBar->addAction(importDataAction);
-    toolBar->addAction(clearGraphAction);
+    toolBar->addAction(clearPlotAction);
     toolBar->addAction(deletePloterAction);
-    connect(saveGraphAction,&QAction::triggered,this,&MarsFigure::saveGraph);
+    connect(savePlotAction,&QAction::triggered,this,&MarsFigure::saveGraph);
     connect(exportDataAction,&QAction::triggered,this,&MarsFigure::showExportDataDialog);
     connect(importDataAction,&QAction::triggered,this,&MarsFigure::showImportDataDialog);
     connect(plotAction,&QAction::triggered,this,&MarsFigure::onPlotActionTriggered);
-    connect(clearGraphAction,&QAction::triggered,this,&MarsFigure::clearGraph);
+    connect(clearPlotAction,&QAction::triggered,this,&MarsFigure::clearCurrentPlot);
     connect(ploterNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentPloter(int)));
     connect(createPloterAction,&QAction::triggered,this,&MarsFigure::createPloter);
     connect(deletePloterAction,&QAction::triggered,this,&MarsFigure::deletePloter);
@@ -303,7 +303,7 @@ void MarsFigure::changeCurrentPloter(int index)
  *@Args: None
  *@Returns: None
  */
-void MarsFigure::clearGraph()
+void MarsFigure::clearCurrentPlot()
 {
     currentPloter->clearGraphs();
     for(int i=0;i<currentPloter->graphCount();i++)
@@ -546,7 +546,7 @@ void MarsFigure::saveGraph()
                 tr("pdf files(*.pdf);;jpg files(*.jpg);; png files(*.png);; bmp file(*.bmp);;"));
     if(fullFileName.isEmpty())
     {
-        emit error(errorInstance(tr("文件名不能为空"),ERROR));
+        emit error(errorInstance(tr("文件名不能为空"),WARNING));
         return ;
     }
     QString fileType =fullFileName.split('.').last();
@@ -585,7 +585,7 @@ void MarsFigure::showExportDataDialog()
                                                     tr("text files(*.txt);;json files(*.json);;binary files(*.dat);;xml files(*.xml)"));
     if(fileName.isEmpty())
     {
-        emit error(errorInstance(tr("文件名不能为空"),ERROR));
+        emit error(errorInstance(tr("文件名不能为空"),WARNING));
         return ;
     }
     QTimer::singleShot(10,[=](){
@@ -603,8 +603,8 @@ void MarsFigure::writeFile(const QString &fileName)
     QFile file(fileName);
     if(!file.open(QIODevice::WriteOnly))
     {
-        QString shortFileName = (fileName.split(QRegExp("[/\]+"))).last();
-        emit error(errorInstance(shortFileName+"打开失败",ERROR));
+        QString shortFileName = (fileName.split(QRegExp("[/\\]+"))).last();
+        emit error(errorInstance(shortFileName+"打开失败",WARNING));
         return ;
     }
     QString fileType =fileName.split('.').last();
@@ -631,7 +631,7 @@ void MarsFigure::writeFile(const QString &fileName)
     }catch(exception e)
     {
         file.close();
-        emit error(errorInstance("导出数据失败",ERROR));
+        emit error(errorInstance("导出数据失败",WARNING));
     }
 }
 
@@ -646,7 +646,7 @@ void MarsFigure::showImportDataDialog()
                                      tr("text files(*.txt);;json files(*.json);;binary files(*.dat);;xml files(*.xml)"));
     if(fileName.isEmpty())
     {
-        emit error(errorInstance(tr("文件名不能为空"),ERROR));
+        emit error(errorInstance(tr("文件名不能为空"),WARNING));
         return ;
     }
     QTimer::singleShot(5,[=](){
@@ -662,16 +662,16 @@ void MarsFigure::showImportDataDialog()
 void MarsFigure::readFile(const QString &fileName)
 {
     QFile file(fileName);
-    QString shortFileName = (fileName.split(QRegExp("[/\]+"))).last();
+    QString shortFileName = (fileName.split(QRegExp("[/\\]+"))).last();
     if(!file.open(QIODevice::ReadOnly))
     {
-        emit error(errorInstance(shortFileName+"打开失败",ERROR));
+        emit error(errorInstance(shortFileName+"打开失败",WARNING));
         return ;
     }
     // max file size 20M
     if(file.size()>1024*1024*20)
     {
-        emit error(errorInstance(shortFileName+"大小已超过20M",ERROR));
+        emit error(errorInstance(shortFileName+"大小已超过20M",WARNING));
         return ;
     }
     QString fileType =shortFileName.split('.').last();
@@ -699,7 +699,7 @@ void MarsFigure::readFile(const QString &fileName)
     }catch(exception e)
     {
         file.close();
-        emit error(errorInstance("导入"+shortFileName+"文件数据失败",ERROR));
+        emit error(errorInstance("导入"+shortFileName+"文件数据失败",WARNING));
     }
 }
 /**
@@ -712,7 +712,7 @@ void MarsFigure::readTextFile(QFile * file)
 
     QTextStream stream(file);
     QString data = stream.readAll();
-    clearGraph();
+    clearCurrentPlot();
     startPlot();
     plot(data);
 
@@ -776,7 +776,7 @@ void MarsFigure::readJSONFile(QFile *file)
         }
     }
     /* start ploting data */
-    clearGraph();
+    clearCurrentPlot();
     startPlot();
 
     for(int i=0;i<graphNumber;i++)
@@ -861,7 +861,7 @@ void MarsFigure::readDatFile(QFile * file)
         }
     }
     /* start ploting data */
-    clearGraph();
+    clearCurrentPlot();
     startPlot();
     for(int i=0;i<graphNumber;i++)
     {

@@ -55,7 +55,7 @@ public slots:
     void plot(QVector<double> &x, QVector<double> &y, int graphId);
     void startPlot();
     void stopPlot();
-    void clearGraph();
+    void clearCurrentPlot();
     void onPlotActionTriggered();
     void changeCurrentPloter(int index);
     QCustomPlot* createPloter();
@@ -83,8 +83,8 @@ private:
     QAction * exportDataAction;
     QAction * importDataAction;
     QAction * plotAction;
-    QAction * saveGraphAction;
-    QAction * clearGraphAction;
+    QAction * savePlotAction;
+    QAction * clearPlotAction;
     QAction * createPloterAction;
     QAction * deletePloterAction;
     QComboBox * ploterNameListBox;

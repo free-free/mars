@@ -1,14 +1,14 @@
 #include "marsplot.h"
 #include "qcustomplot.h"
 #include <QWheelEvent>
-
+#include <QDebug>
 
 /**
  *@Desc: do no thing here
  *@Args: None
  *@Returns: None
  */
-MarsPlot::MarsPlot(QWidget * parent ):QCustomPlot(parent)
+MarsPlot::MarsPlot(QWidget * parent):QCustomPlot(parent)
 {
     /* hi,buddy you can fuck here */
 }
@@ -24,7 +24,6 @@ MarsPlot::~MarsPlot()
 {
     /* hi,buddy you can fuck here */
 }
-
 
 /**
  *@Desc: override QCustomPlot's wheelEvent to handle xAxis zooming and yAxis zooming seperately
@@ -51,4 +50,12 @@ void MarsPlot::wheelEvent(QWheelEvent *event)
     }
     QCustomPlot::wheelEvent(event);
 
+}
+
+void MarsPlot::focusInEvent(QFocusEvent *event)
+{
+    if(event->gotFocus())
+    {
+
+    }
 }

@@ -8,9 +8,14 @@ class MarsPlot : public QCustomPlot
 {
 
 public:
-    MarsPlot(QWidget * parent=0);
+    explicit MarsPlot(QWidget * parent=0);
     ~MarsPlot();
    void wheelEvent (QWheelEvent *event);
+   void focusInEvent(QFocusEvent*event);
+
+signals:
+   void focusIn(MarsPlot * focusInObj);
+
 
 };
 

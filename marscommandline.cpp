@@ -64,7 +64,7 @@ QTextStream & operator>>(QTextStream & in,QList<QByteArray> *list)
 
 MarsCommandLine::MarsCommandLine(QWidget * parent, bool viewOnly,int maxIBufferSize, int maxOBufferSize):QPlainTextEdit(parent)
 {
-    document()->setMaximumBlockCount(100);
+ //   document()->setMaximumBlockCount(100);
     cmdStyle = new MarsCommandLine::Style(this);
     if(viewOnly)
         setReadOnly(true);
@@ -150,7 +150,6 @@ MarsCommandLine::~MarsCommandLine()
 void MarsCommandLine::printData(QByteArray  data)
 {
     /* please implement me ,bitch*/
-     qDebug()<<data;
     if(data.isEmpty())
         return ;
     cursorNextLine();
@@ -167,7 +166,6 @@ void MarsCommandLine::printData(QByteArray  data)
 void MarsCommandLine::printData(QString data)
 {
 
-    qDebug()<<data;
     if(data.isEmpty())
         return ;
     cursorNextLine();
@@ -203,7 +201,7 @@ MarsCommandLine & MarsCommandLine::operator <<(const QByteArray &data)
 {
 
     printData(data);
-    if(!isReadOnly())
+    if(!isReadOnly()&&!data.isEmpty())
     {
         in->append(data);
         emit dataIn();
@@ -220,7 +218,7 @@ MarsCommandLine & MarsCommandLine::operator <<(const QByteArray &data)
 MarsCommandLine & MarsCommandLine::operator <<(const QString &data)
 {
     printData(data);
-    if(!isReadOnly())
+    if(!isReadOnly()&&!data.isEmpty())
     {
         in->append(data);
         emit dataIn();
@@ -237,7 +235,7 @@ MarsCommandLine & MarsCommandLine::operator <<( MarsCommandLine &dataSender)
 {
 
     printData(dataSender.readData());
-    if(!isReadOnly())
+    if(!isReadOnly()&&!out->isEmpty())
     {
         in->append(out->last());
         emit dataIn();
@@ -253,7 +251,7 @@ MarsCommandLine & MarsCommandLine::operator <<(QTextStream & dataSender)
 {
 
     printData(dataSender.readAll());
-    if(!isReadOnly())
+    if(!isReadOnly()&&!out->isEmpty())
     {
         in->append(out->last());
         emit dataIn();
@@ -484,6 +482,7 @@ QString  MarsCommandLine::inputBufferText()
 MarsBytesListBuffer * MarsCommandLine::outputBuffer()
 {
     return out;
+
 }
 /**
  *@Desc: return output buffer text
@@ -526,7 +525,21 @@ MarsError MarsCommandLine::errorInstance(QString msg, MarsErrorLevel level)
     return error;
 }
 
+void MarsCommandLine::focusInEvent(QFocusEvent *event)
+{
 
+    if(event->gotFocus())
+    {
+        emit focusIn(this);
+    }
+}
+
+void MarsCommandLine::focusOutEvent(QFocusEvent *event)
+{
+    /*
+     * nothing here
+     */
+}
 /* **********************************************************************
  *
  * ----------MarsCommandLine::Style class implementation--------------------------

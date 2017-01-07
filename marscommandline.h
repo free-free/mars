@@ -12,6 +12,8 @@ class QContextMenuEvent ;
 class QColor;
 class QTextStream;
 class MarsBytesListBuffer;
+class QFocusEvent;
+
 
 class MarsCommandLine : public QPlainTextEdit
 {
@@ -53,7 +55,7 @@ public:
     void enableViewOnly(bool ro);
     void cursorNextLine(const QString &ps);
     void cursorNextLine();
-    int cursorColumnNumber() const ;
+    int  cursorColumnNumber() const ;
     MarsError errorInstance(QString msg, MarsErrorLevel=INFO);
     MarsCommandLine::Style * style();
     MarsCommandLine & operator <<(const QByteArray &data);
@@ -64,8 +66,8 @@ public:
     MarsCommandLine & operator >>(MarsCommandLine & dataReceiver);
     MarsCommandLine & operator <<(QTextStream & dataSender);
     MarsCommandLine & operator >>(QTextStream & dataReceiver);
-
-
+    void focusInEvent(QFocusEvent *event);
+    void focusOutEvent(QFocusEvent *event);
 
     // buffer operation
     MarsBytesListBuffer * inputBuffer() ;
@@ -80,11 +82,13 @@ public slots:
     void importData();
 
 
+
 signals:
     void dataIn();
-    void error(const MarsError & error );
+    void errors(MarsError  error );
     void dataImportRequest();
     void dataExportRequest();
+    void focusIn(MarsCommandLine * focusInObj);
 
 private:
     Style * cmdStyle;

@@ -56,7 +56,6 @@ void MarsSerialPort::disconnect()
         emit disconnected();
     }
 
-
 }
 
 /*
@@ -86,7 +85,7 @@ void MarsSerialPort::sendFileData(QFile & file)
  *@Returns: QByteArray
  *
  */
-QByteArray MarsSerialPort::recvData()
+QByteArray MarsSerialPort::recvRawData()
 {
     /* waiting you to fuck me */
     QByteArray data =readAll();

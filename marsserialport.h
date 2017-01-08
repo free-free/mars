@@ -33,7 +33,7 @@ public slots:
     // connect to MainWindow disconnectSPACtion's triggered signal
     void disconnect();
     // send data
-    QByteArray recvData();
+    QByteArray recvRawData();
     // send raw hex data
     void sendByteData(QByteArray data);
     // send file data

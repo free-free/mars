@@ -43,9 +43,7 @@
      <number>0</number>
     </property>
     <item row="0" column="1">
-     <widget class="QWidget" name="mainWidget" native="true">
-      <zorder>groupBox</zorder>
-     </widget>
+     <widget class="QWidget" name="mainWidget" native="true"/>
     </item>
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox">
@@ -55,10 +53,15 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="maximumSize">
+       <size>
+        <width>80</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="styleSheet">
        <string notr="true">background-color:#666;
-width:80px;
-height:auto;
+width:60px;
 margin:0px 0px 0px 0px;
 border:0px 0px 0px 0px;
 padding:0px 0px 0px 0px;</string>
@@ -66,32 +69,43 @@ padding:0px 0px 0px 0px;</string>
       <property name="title">
        <string/>
       </property>
-      <widget class="QPushButton" name="figureWindowBtn">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>80</y>
-         <width>81</width>
-         <height>51</height>
-        </rect>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
        </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+       <property name="topMargin">
+        <number>0</number>
        </property>
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+       <property name="rightMargin">
+        <number>0</number>
        </property>
-       <property name="styleSheet">
-        <string notr="true">
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item row="3" column="0">
+        <widget class="QPushButton" name="figureWindowBtn">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">
 QPushButton{
 border:none;
 background-color:#666;
 color:#efefef;
 width:100%;
 height:40px;
+padding-top:5px;
+padding-bottom:5px;
 }
 QPushButton:hover
 {
@@ -101,46 +115,175 @@ QPushButton:default{
 	  background-color:#444;
      color:#99ccff;
 }</string>
-       </property>
-       <property name="text">
-        <string> 图形</string>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="autoExclusive">
-        <bool>false</bool>
-       </property>
-       <property name="autoDefault">
-        <bool>false</bool>
-       </property>
-       <property name="flat">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="histogramBtn">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>130</y>
-         <width>81</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">
+         </property>
+         <property name="text">
+          <string> 图形</string>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="spaceLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="baseSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">display:block;
+border:none;
+background-color:#666;
+color:#efefef;
+width:100%;
+height:40px;
+border-bottom:1px solid #333;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="margin">
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="spacing">
+          <number>5</number>
+         </property>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="connectBtn">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">
+QPushButton{
+border:none;
+background-color:#666;
+color:#efefef;
+width:100%;
+height:50px;
+/*position:absolute;*/
+/*bottom:20px;*/
+
+}
+QPushButton:hover
+{
+      background-color:#999;
+}
+/*
+QPushButton:default{
+	  background-color:#444;
+}
+*/</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/icon/earch-disconnected</normaloff>:/icon/earch-disconnected</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>48</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+S</string>
+           </property>
+           <property name="default">
+            <bool>false</bool>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="spaceLabel2">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="margin">
+            <number>8</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="4" column="0">
+        <widget class="QPushButton" name="histogramBtn">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">
 QPushButton{
 border:none;
 background-color:#666;
 color:#efefef;
 width:100%;
 height:40px;
+padding-top:5px;
+padding-bottom:5px;
 }
 QPushButton:hover
 {
@@ -151,37 +294,34 @@ QPushButton:default{
 	  background-color:#444;
 }
 </string>
-       </property>
-       <property name="text">
-        <string>直方图</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="consoleWindowBtn">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>30</y>
-         <width>81</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">
+         </property>
+         <property name="text">
+          <string>直方图</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QPushButton" name="consoleWindowBtn">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">
 QPushButton{
 border:none;
 background-color:#666;
 color:#efefef;
 width:100%;
 height:40px;
+padding-top:5px;
+padding-bottom:5px;
+
 }
 QPushButton:hover
 {
@@ -199,41 +339,22 @@ QPushButton:default{
 }
 
 </string>
-       </property>
-       <property name="text">
-        <string>控制台</string>
-       </property>
-       <property name="default">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="spaceLabel">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>81</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border:none;
-background-color:#666;
-color:#efefef;
-width:100%;
-height:40px;
-border-bottom:1px solid #333;</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
+         </property>
+         <property name="text">
+          <string>控制台</string>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="default">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>

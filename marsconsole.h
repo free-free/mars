@@ -27,7 +27,7 @@ signals:
     void dataReady();
     void getImportFileName(QString fileName);
     void getExportFileName(QString fileName);
-
+    void plotDataRequest(MarsCommandLine * requestObj);
 
 public slots:
     void showExportDataDialog();
@@ -49,6 +49,7 @@ public slots:
     void clearCurrentCmdLine();
     void onCmdLineDataReady();
     void onCmdLineFocusIn(MarsCommandLine * focusInObj);
+    void onPlotDataActionTriggered();
 
 
 
@@ -67,6 +68,8 @@ private:
     QToolBar * toolBar;
     QAction * exportDataAction;
     QAction * importDataAction;
+    QAction * clearCmdLineAction;
+    QAction * plotDataAction;
     QComboBox * cmdLineNameListBox;
 
 };

@@ -1,5 +1,6 @@
 #include "marsconsole.h"
 #include "marscommandline.h"
+#include "marsbyteslistbuffer.h"
 #include <QTextStream>
 #include <QFileDialog>
 #include <QGridLayout>
@@ -9,6 +10,10 @@
 #include <QVBoxLayout>
 #include <QComboBox>
 #include <QTimer>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
+
 
 /**
  *@Desc: init gridlayout ,tool bar and command line
@@ -71,6 +76,8 @@ void MarsConsole::initToolBar()
     toolBar->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
     exportDataAction = new QAction(QIcon(":/icon/export"),tr("导出数据"),this);
     importDataAction = new QAction(QIcon(":/icon/import"),tr("导入数据"),this);
+    clearCmdLineAction = new QAction(QIcon(":/icon/clear"),tr("清空输出"),this);
+    plotDataAction = new QAction(QIcon(":/icon/plot"),tr("曲线图"),this);
     cmdLineNameListBox =new QComboBox(this);
     cmdLineNameListBox->setStyleSheet("QComboBox{"
                              "padding:0px 10px 0px 10px;"
@@ -96,9 +103,13 @@ void MarsConsole::initToolBar()
     toolBar->addWidget(cmdLineNameListBox);
     toolBar->addAction(exportDataAction);
     toolBar->addAction(importDataAction);
+    toolBar->addAction(clearCmdLineAction);
+    toolBar->addAction(plotDataAction);
     connect(exportDataAction,&QAction::triggered,this,&MarsConsole::showExportDataDialog);
     connect(importDataAction,&QAction::triggered,this,&MarsConsole::showImportDataDialog);
     connect(cmdLineNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentCmdLine(int)));
+    connect(clearCmdLineAction,&QAction::triggered,this,&MarsConsole::clearCurrentCmdLine);
+    connect(plotDataAction,&QAction::triggered,this,&MarsConsole::onPlotDataActionTriggered);
     layout->addWidget(toolBar);
 }
 
@@ -224,6 +235,16 @@ void MarsConsole::onCmdLineFocusIn(MarsCommandLine * focusInObj)
     connect(cmdLineNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentCmdLine(int)));
 
 }
+
+/**
+ *@Desc: slot method for plotDataAction(emit plotDataRequest signal)
+ *@Args: None
+ *@Returns: None
+ */
+void MarsConsole::onPlotDataActionTriggered()
+{
+     emit plotDataRequest(currentCmdLine);
+}
 /**
  *@Desc: layout command line in console window
  *@Args: None
@@ -264,7 +285,7 @@ void MarsConsole::arrangeCommandLine()
 }
 
 /**
- *@Desc: return specific command line instance reference
+ *@Desc: resolving the specific command line instance reference
  *@Args: int( command line instance index)
  *@Return: MarsCommandLine &
  */
@@ -277,7 +298,7 @@ MarsCommandLine * MarsConsole::commandLine(int index)
     return cmdLineContainer->at(index);
 }
 /**
- *@Desc: slot function for command line input data ready signal
+ *@Desc: slot method for command line's dataReady signal(emit dataReady signal)
  *@Args: None
  *@Returns: None
  */
@@ -287,17 +308,17 @@ void MarsConsole::onCmdLineDataReady()
 }
 
 /**
- *@Desc: slot function for saving command  data  to a file
+ *@Desc: slot method for showing exportion data dialog
  *@Args: None
  *@Returns: None
  */
 void MarsConsole::showExportDataDialog()
 {
     QString fileName = QFileDialog::getSaveFileName(this,tr("保存为....."),QString(),
-                                                    tr("text files(*.txt);;json files(*.json);;binary files(*.dat);; xml files(*.xml)"));
+          tr("*.txt files(*.txt);;*.json files(*.json);;*.dat files(*.dat);; *.xml files(*.xml)"));
     if(fileName.isEmpty())
     {
-        emit errors(errorInstance(tr("文件名不能为空"),ERROR));
+        emit errors(errorInstance(tr("文件名不能为空"),WARNING));
         return ;
     }
     QTimer::singleShot(10,[=](){
@@ -317,7 +338,7 @@ void MarsConsole::writeFile(QString fileName)
     if(!file.open(QIODevice::WriteOnly))
     {
         QString shortFileName = (fileName.split(QRegExp("[/\\]+"))).last();
-        emit errors(errorInstance(shortFileName+"打开失败",ERROR));
+        emit errors(errorInstance(shortFileName+"打开失败",WARNING));
         return ;
     }
     QString fileType =fileName.split('.').last();
@@ -354,7 +375,7 @@ void MarsConsole::writeFile(QString fileName)
 void MarsConsole::showImportDataDialog()
 {
     QString fileName = QFileDialog::getOpenFileName(this,tr("导入文件"),QString(),
-                                     tr("text files(*.txt);;json files(*.json);; binary files(*.dat);; xml files(*.xml)"));
+            tr("*.txt files(*.txt);;*.json files(*.json);; *.dat files(*.dat);; *.xml files(*.xml)"));
     if(fileName.isEmpty())
     {
         emit errors(errorInstance(tr("文件名不能为空"),WARNING));
@@ -421,7 +442,6 @@ void MarsConsole::readFile(QString fileName)
 void MarsConsole::readTextFile(QFile * file)
 {
     QTextStream stream(file);
-    qDebug()<<"focus widget";
     *currentCmdLine<<stream;
 }
 
@@ -437,13 +457,37 @@ void MarsConsole::writeTextFile(QFile * file)
 }
 
 /**
- *@Desc: read josn file and import data into  input buffer
+ *@Desc: read json file and import data into  input buffer
  *@Args: QFile *
  *@Returns: None
  */
 void MarsConsole::readJSONFile(QFile *file)
 {
-
+    QByteArray saveData=file->readAll();
+    /* load data from json file */
+    QJsonDocument document=QJsonDocument::fromJson(saveData);
+    QJsonArray xArray=document.object().take("x").toArray();
+    QJsonArray yArray=document.object().take("y").toArray();
+    int dataSize = xArray.size();
+    int dataColumnNum = yArray.size();
+    QList<QJsonArray> yArrayList;
+    QByteArray  input;
+    /* check y axis value */
+    for(int i=0;i<dataColumnNum;++i)
+    {
+        yArrayList.append(yArray.at(i).toArray());
+    }
+    /* convert json array to qbytearray */
+    for(int i=0;i<dataSize;i++)
+    {
+        input.append(xArray.at(i).toVariant().toByteArray());
+        for(int j =0;j<dataColumnNum;j++)
+        {
+            input.append(' '+yArrayList.at(j).at(i).toVariant().toByteArray());
+        }
+        input.append('\n');
+    }
+     *currentCmdLine<<input;
 }
 
 /**
@@ -453,17 +497,122 @@ void MarsConsole::readJSONFile(QFile *file)
  */
 void MarsConsole::writeJSONFile(QFile * file)
 {
-
+    if(currentCmdLine->outputBuffer()->isEmpty())
+        return ;
+    qint64 startTime=QDateTime::currentMSecsSinceEpoch();
+    QJsonObject data;
+    QJsonArray yValue;
+    QVariantList xValueList;
+    QList<QVariantList*> yValueList;
+    int dataSize = currentCmdLine->outputBuffer()->length();
+    int dataColumnNum = currentCmdLine->outputBuffer()->at(0).split(' ').length();
+    for(int i =0;i<dataColumnNum;i++)
+    {
+        yValueList.append(new QVariantList);
+    }
+    QList<QByteArray> dataColumnArray;
+    for(int i =0 ;i<dataSize;i++)
+    {
+        xValueList.append(i);
+        dataColumnArray = currentCmdLine->outputBuffer()->at(i).split(' ');
+        for(int columnIndex =0;columnIndex<dataColumnNum;columnIndex++)
+        {
+           yValueList.at(columnIndex)->append(dataColumnArray.at(columnIndex).toDouble());
+        }
+    }
+    /* convert y axis value to VariantList */
+    for(int i =0;i<dataColumnNum;i++)
+    {
+        yValue.append(QJsonArray::fromVariantList(*(yValueList.at(i))));
+        delete yValueList.at(i);
+    }
+    /* convert x axis value variant list to json array*/
+    data["x"]=QJsonArray::fromVariantList(xValueList);
+    data["y"]=yValue;
+    /* writing json document to file */
+    QJsonDocument saveDocument(data);
+    file->write(saveDocument.toJson());
+    qDebug()<<"save data time(ms): "<<QDateTime::currentMSecsSinceEpoch()-startTime;
 }
 
+/**
+ *@Desc: read dat file and import data into  input buffer
+ *@Args: QFile *
+ *@Returns: None
+ */
 void MarsConsole::readDatFile(QFile *file)
 {
+    QByteArray saveData=file->readAll();
+    /* load data from json file */
+    QJsonDocument document=QJsonDocument::fromBinaryData(saveData);
+    QJsonArray xArray=document.object().take("x").toArray();
+    QJsonArray yArray=document.object().take("y").toArray();
+    int dataSize = xArray.size();
+    int dataColumnNum = yArray.size();
+    QList<QJsonArray> yArrayList;
+    QByteArray  input;
+    /* check y axis value */
+    for(int i=0;i<dataColumnNum;++i)
+    {
+        yArrayList.append(yArray.at(i).toArray());
+    }
+    /* convert json array to qbytearray */
+    for(int i=0;i<dataSize;i++)
+    {
+        input.append(xArray.at(i).toVariant().toByteArray());
+        for(int j =0;j<dataColumnNum;j++)
+        {
+            input.append(' '+yArrayList.at(j).at(i).toVariant().toByteArray());
+        }
+        input.append('\n');
+    }
+    *currentCmdLine<<input;
 
 }
 
+/**
+ *@Desc: write output buffer's data into dat file
+ *@Args: QFile * file
+ *@Returns: None
+ */
 void MarsConsole::writeDatFile(QFile *file)
 {
-
+    if(currentCmdLine->outputBuffer()->isEmpty())
+        return ;
+    qint64 startTime=QDateTime::currentMSecsSinceEpoch();
+    QJsonObject data;
+    QJsonArray yValue;
+    QVariantList xValueList;
+    QList<QVariantList*> yValueList;
+    int dataSize = currentCmdLine->outputBuffer()->length();
+    int dataColumnNum = currentCmdLine->outputBuffer()->at(0).split(' ').length();
+    for(int i =0;i<dataColumnNum;i++)
+    {
+        yValueList.append(new QVariantList);
+    }
+    QList<QByteArray> dataColumnArray;
+    for(int i =0 ;i<dataSize;i++)
+    {
+        xValueList.append(i);
+        dataColumnArray = currentCmdLine->outputBuffer()->at(i).split(' ');
+        for(int columnIndex =0;columnIndex<dataColumnNum;columnIndex++)
+        {
+           yValueList.at(columnIndex)->append(dataColumnArray.at(columnIndex).toDouble());
+        }
+    }
+    /* convert y axis value to VariantList */
+    for(int i =0;i<dataColumnNum;i++)
+    {
+        yValue.append(QJsonArray::fromVariantList(*(yValueList.at(i))));
+        delete yValueList.at(i);
+    }
+    /* convert x axis value variant list to json array*/
+    data["x"]=QJsonArray::fromVariantList(xValueList);
+    data["y"]=yValue;
+    /* writing json document to file */
+    QJsonDocument saveDocument(data);
+    file->write(saveDocument.toBinaryData());
+    qDebug()<<"save data time(ms): "<<QDateTime::currentMSecsSinceEpoch()-startTime;
 }
 /**
  *@Desc: read xml file and import data into input buffer

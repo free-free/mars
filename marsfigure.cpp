@@ -473,7 +473,6 @@ void MarsFigure::plot(QVector<double> &x, QVector<double> &y, int graphId,int pl
     /* return back if plotState is false ,it indicate ploting stopped */
     if (!plotState)
         return ;
-
     if((ploterContainer->length()-1)<plotId)
     {
         if(!createPloter())
@@ -582,7 +581,7 @@ void MarsFigure::saveGraph()
 void MarsFigure::showExportDataDialog()
 {
     QString fileName = QFileDialog::getSaveFileName(this,tr("导出数据"),QString(),
-                                                    tr("text files(*.txt);;json files(*.json);;binary files(*.dat);;xml files(*.xml)"));
+                                                    tr("*.txt files(*.txt);;*.json files(*.json);;*.dat files(*.dat);; *.xml files(*.xml)"));
     if(fileName.isEmpty())
     {
         emit error(errorInstance(tr("文件名不能为空"),WARNING));
@@ -643,7 +642,7 @@ void MarsFigure::writeFile(const QString &fileName)
 void MarsFigure::showImportDataDialog()
 {
     QString fileName = QFileDialog::getOpenFileName(this,tr("导入文件"),QString(),
-                                     tr("text files(*.txt);;json files(*.json);;binary files(*.dat);;xml files(*.xml)"));
+                                     tr("*.txt files(*.txt);;*.json files(*.json);;*.dat files(*.dat);; *.xml files(*.xml)"));
     if(fileName.isEmpty())
     {
         emit error(errorInstance(tr("文件名不能为空"),WARNING));

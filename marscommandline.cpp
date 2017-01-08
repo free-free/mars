@@ -9,6 +9,7 @@
 #include <QList>
 #include <QFileDialog>
 #include <QTextStream>
+#include <QScrollBar>
 #include "marsbyteslistbuffer.h"
 
 
@@ -73,7 +74,39 @@ MarsCommandLine::MarsCommandLine(QWidget * parent, bool viewOnly,int maxIBufferS
     setContextMenuPolicy(Qt::CustomContextMenu);
     out = new MarsBytesListBuffer(maxOBufferSize);
     in = new MarsBytesListBuffer(maxIBufferSize);
+    scrollBar = new QScrollBar(this);
+    scrollBar->setStyleSheet(" QScrollBar:vertical {"
+                                 "border: 0px 0px 0px px;"
+                                 "background: #666;"
+                                 "width: 10px;"
+                                 "padding:16px 0px 16px 0px;"
+                             "}"
+                             "QScrollBar::handle:vertical {"
+                                 "background: #bbb;"
+                                 "border-radius:5px;"
+                                 "min-height: 60px;"
+                             "}"
+                             "QScrollBar::add-line:vertical {"
+                                 "border: 0px 0px 0px 0px;"
+                                 "border-top:1px solid #333;"
+                                 "background: #888;"
+                                 "height: 15px;"
+                                 "subcontrol-position: bottom;"
+                                 "subcontrol-origin: margin;"
+                             "}"
+                             "QScrollBar::sub-line:vertical {"
+                                 "border: 0px 0px 0px 0px;"
+                                 "border-bottom:1px solid #333;"
+                                 "background: #888;"
+                                 "height: 15px;"
+                                 "subcontrol-position: top;"
+                                 "subcontrol-origin: margin;"
+                             "}"
+                             );
+    setVerticalScrollBar(scrollBar);
+    setWordWrapMode(QTextOption::WrapAnywhere);
     connect(this,&MarsCommandLine::customContextMenuRequested,this,&MarsCommandLine::createCustomContextMenu);
+
 }
 
 void MarsCommandLine::createCustomContextMenu(QPoint pos)
@@ -155,7 +188,7 @@ void MarsCommandLine::printData(QByteArray  data)
     cursorNextLine();
     insertPlainText(data);
     out->append(data);
-
+    scrollBar->setValue(this->blockCount());
 }
 
 /**
@@ -171,7 +204,7 @@ void MarsCommandLine::printData(QString data)
     cursorNextLine();
     insertPlainText(data);
     out->append(data);
-
+    scrollBar->setValue(this->blockCount());
 }
 
 /**

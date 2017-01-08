@@ -13,7 +13,7 @@ class QColor;
 class QTextStream;
 class MarsBytesListBuffer;
 class QFocusEvent;
-
+class QScrollBar;
 
 class MarsCommandLine : public QPlainTextEdit
 {
@@ -75,6 +75,7 @@ public:
     QString  inputBufferText();
     QString  outputBufferText();
 
+
 public slots:
     void createCustomContextMenu(QPoint pos);
     void clearAll();
@@ -95,6 +96,7 @@ private:
     // input and output buffer;
     MarsBytesListBuffer *in;
     MarsBytesListBuffer *out;
+    QScrollBar * scrollBar;
 
 
 protected:

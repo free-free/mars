@@ -5,6 +5,7 @@
 #include "marscommandline.h"
 #include "marsconsole.h"
 #include "marsfigure.h"
+#include "marsbyteslistbuffer.h"
 #include "qcustomplot.h"
 
 #include <QtSerialPort/QSerialPort>
@@ -80,6 +81,7 @@ void MainWindow::initConnections()
 {
     connect(ui->connectSPAction,&QAction::triggered,devSerialPort,&MarsSerialPort::connect);
     connect(ui->disconnectSPAction,&QAction::triggered,devSerialPort,&MarsSerialPort::disconnect);
+    connect(ui->connectBtn,&QPushButton::clicked,this,&MainWindow::onConnectBtnClicked);
     connect(devSerialPort,&MarsSerialPort::disconnected,this,&MainWindow::onSerialPortClosed);
     connect(devSerialPort,&MarsSerialPort::connected,this,&MainWindow::onSerialPortOpened);
     connect(devSerialPort,&MarsSerialPort::readyRead,this,&MainWindow::onSerialPortDataReady);
@@ -169,6 +171,22 @@ void MainWindow::onSerialPortSettingsUpdated(SerialPortSettings settings)
 }
 
 /*
+ *@Desc: slot method for connectBtn clicked,connect to serial port or disconnect serial port
+ *@Args: None
+ *@Returns: None
+ */
+void MainWindow::onConnectBtnClicked()
+{
+    if(devSerialPort->isOpen())
+    {
+        devSerialPort->disconnect();
+    }
+    else
+    {
+        devSerialPort->connect();
+    }
+}
+/*
  *@Desc: handler MarsSerialPort's opened signal
  *@Args: None
  *@Returns: None
@@ -178,6 +196,8 @@ void MainWindow::onSerialPortOpened()
     ui->connectSPAction->setEnabled(false);
     ui->serialPortConfigDialogAction->setEnabled(false);
     ui->disconnectSPAction->setEnabled(true);
+    ui->connectBtn->setIcon(QIcon(":/icon/earth-connected"));
+    ui->connectBtn->setToolTip(tr("关闭串口"));
 }
 
 /*
@@ -190,95 +210,190 @@ void MainWindow::onSerialPortClosed()
     ui->serialPortConfigDialogAction->setEnabled(true);
     ui->connectSPAction->setEnabled(true);
     ui->disconnectSPAction->setEnabled(false);
+    ui->connectBtn->setIcon(QIcon(":/icon/earth-disconnected"));
+    ui->connectBtn->setToolTip(tr("连接串口"));
 }
 
-
 /*
- *@Desc: handler MarsSerialPort's closed signal
+ *@Desc: handler MarsSerialPort's dataReady signal,
+ *     read serial port data and send it to figure or console
  *@Args: None
  *@Returns: None
  */
 void MainWindow::onSerialPortDataReady()
 {
-    //
+    switch(currentWindowId)
+    {
+        /* read serial port data and send data to console */
+        case 0:
+            break;
+        /* read serial port data and send data to figure */
+        case 1:
+            break;
+        default:
+            break;
+
+    }
 }
 
+/*
+ *@Desc: slot for consoleWindowBtn's clicked signal, switch current window to console window
+ *@Args: None
+ *@Returns: None
+ */
 void MainWindow::onConsoleWindowBtnClicked()
 {
     if(currentWindowId != 0)
     {
         switchWindow(0);
-        ui->consoleWindowBtn->setDefault(true);
-        ui->figureWindowBtn->setDefault(false);
     }
 }
 
+/*
+ *@Desc: slot for figureWindowBtn's clicked signal, switch current window to figure window
+ *@Args: None
+ *@Returns: None
+ */
 void MainWindow::onFigureWindowBtnClicked()
 {
     if(currentWindowId != 1)
     {
         switchWindow(1);
-        ui->figureWindowBtn->setDefault(true);
-        ui->consoleWindowBtn->setDefault(false);
     }
 }
 
+/*
+ *@Desc: slot for console's dataReady signal,
+ *   be responsible for sending console's data to serial port
+ *@Args: None
+ *@Returns: None
+ */
+void MainWindow::onConsoleDataReady()
+{
+    *(console->commandLine(0))>>*(console->commandLine(1));
+}
 
+/*
+ *@Desc: slot for console's plotDataRequest signal,
+ *   be responsible for parse console's data and plot it's graph in figure window
+ *@Args: MarsCommandLine * requestedObj
+ *@Returns: None
+ */
+void MainWindow::onConsolePlotDataRequest(MarsCommandLine *requestedObj)
+{
+    /* switch current window to figure window */
+    switchWindow(1);
+    /* get data size from console's data buffer */
+    int dataSize = requestedObj->outputBuffer()->length();
+    if(dataSize == 0)
+        return ;
+    QVector<double> x;
+    QList<QVector<double>*> y;
+    QList<QByteArray> dataLineItems;
+    /* calculate graph number */
+    int dataGraphNum = requestedObj->outputBuffer()->at(0).split(' ').length();
+    /* create container for y axis value  */
+    for(int i =0;i<dataGraphNum;i++)
+    {
+        y.append(new QVector<double>());
+    }
+    /* parse data from console's command line data */
+    for(int i = 0;i<dataSize;i++)
+    {
+        x.append(i);
+        dataLineItems = requestedObj->outputBuffer()->at(i).split(' ');
+        for(int j =0;j<dataGraphNum;j++)
+        {
+            y.at(j)->append(dataLineItems.at(j).toDouble());
+        }
+    }
+    int graphId = 0;
+    int plotId = 0;
+    /* starting plot */
+    figure->startPlot();
+    for(int i=0;i<dataGraphNum;i++)
+    {
+        /* calculate plot id , max plot number is  4 */
+        plotId = ceil(i/4);
+        /* calculate graph id ,max graph number of each plot is also 4 */
+        graphId = i%4;
+        /* starting plot */
+        figure->plot(x,*y.at(i),graphId,plotId);
+        delete y.at(i);
+    }
 
+}
+
+/*
+ *@Desc: create console window and connect signals to slots ,finally render it in top level
+ *@Args: None
+ *@Returns: None
+ */
 void MainWindow::renderConsoleWindow()
 {
 
     if(!console)
     {
-        console = new MarsConsole(ui->mainWidget);
-        console->createCmdLine(true);
+        console = new MarsConsole(ui->mainWidget,false,100000,100000);
+        console->createCmdLine(true,100000,100000);
+        tick = new QTimer(this);
+        tick->setInterval(1);
+        tick->start();
+        connect(tick,&QTimer::timeout,this,&MainWindow::tickTask);
         connect(console->commandLine(0),&MarsCommandLine::dataIn,this,&MainWindow::onConsoleDataReady);
         connect(console,&MarsConsole::errors,this,&MainWindow::onApplicationError);
+        connect(console,&MarsConsole::plotDataRequest,this,&MainWindow::onConsolePlotDataRequest);
     }
     console->setHidden(false);
     mainWidgetLayout->addWidget(console,1,1);
-    currentWindowId = 0;
-    updateMenuBar(currentWindowId);
+
 
 }
 
-
+/*
+ *@Desc: create figure window and connect signals to slots ,finally render it in top level
+ *@Args: None
+ *@Returns: None
+ */
 void MainWindow::renderFigureWindow()
 {
 
     if(!figure)
     {
         figure = new MarsFigure(ui->mainWidget);
-        tick = new QTimer(this);
-        tick->setInterval(1000);
-        tick->start();
-        connect(tick,&QTimer::timeout,this,&MainWindow::tickTask);
         connect(figure,&MarsFigure::error,this,&MainWindow::onApplicationError);
         connect(ui->saveGraphAction,&QAction::triggered,figure,&MarsFigure::saveGraph);
-
     }
     figure->setHidden(false);
     mainWidgetLayout->addWidget(figure,1,1);
-    currentWindowId = 1;
-    updateMenuBar(currentWindowId);
+
 }
 
 
 
-void MainWindow::onConsoleDataReady()
-{
-    *(console->commandLine(0))>>*(console->commandLine(1));
-}
+
 
 void MainWindow::tickTask()
 {
-    static int lastX=0;
-    double x,y1,y2;
-
+    static qint64 lastX=0;
+    double x,y1,y2,y3,y4,y5,y6;
+    if(lastX>=10000)
+        return;
+     QByteArray bytes;
       x = lastX;
       y1 = qExp(-x/150.0)*qCos(x/10.0)*10;
-      y1 = qCos(x/10.0)*5;
-      y2 = qExp(-x/150.0)*5;
+      y2 = qCos(x/10.0)*10;
+      y3 = qExp(-x/150.0)*10;
+      y4 = qSin(x/20.0)*10;
+      y5 = qSin(x/30.0)*10;
+      y6 = qCos(x/50.0)*10;
+      bytes.append(QString::number(y1)+' ');
+      bytes.append(QString::number(y2)+' ');
+      bytes.append(QString::number(y3)+' ');
+      bytes.append(QString::number(y4)+' ');
+      bytes.append(QString::number(y5)+' ');
+      bytes.append(QString::number(y6));
+      *(console->commandLine(0))<<bytes;
     //qDebug()<<"x:"<<x<<"y1:"<<y1<<"y2:"<<y2;
      //figure->plot(x,y1,0,0);
      //figure->plot(x,y2,1,1);
@@ -294,12 +409,18 @@ void MainWindow::tickTask()
     lastX++;
 
 }
+/*
+ *@Desc: update menu bar's action  and widget status when current window has changed
+ *@Args: int winId(0 denotes console window ,1  denotes figure window)
+ *@Returns: None
+ */
 void MainWindow::updateMenuBar(int winId)
 {
     switch(winId)
     {
         case 0:
             ui->saveGraphAction->setEnabled(false);
+            ui->clearScreenAction->setText(tr("清空输出"));
             connect(ui->exportAction,&QAction::triggered,console,&MarsConsole::showExportDataDialog);
             connect(ui->importAction,&QAction::triggered,console,&MarsConsole::showImportDataDialog);
             connect(ui->clearScreenAction,&QAction::triggered,console,&MarsConsole::clearCurrentCmdLine);
@@ -312,6 +433,7 @@ void MainWindow::updateMenuBar(int winId)
             break;
         case 1:
             ui->saveGraphAction->setEnabled(true);
+            ui->clearScreenAction->setText(tr("清除图像"));
             connect(ui->importAction,&QAction::triggered,figure,&MarsFigure::showImportDataDialog);
             connect(ui->exportAction,&QAction::triggered,figure,&MarsFigure::showExportDataDialog);
             connect(ui->clearScreenAction,&QAction::triggered,figure,&MarsFigure::clearCurrentPlot);
@@ -327,17 +449,22 @@ void MainWindow::updateMenuBar(int winId)
     }
 }
 
+/*
+ *@Desc: remove current window and hide current window
+ *@Args: None
+ *@Returns: None
+ */
 void MainWindow::beforeSwitchWindow()
 {
 
     switch(currentWindowId)
     {
-        // remove console window from layout and hide it
+        /* remove console window from layout and hide it */
         case 0:
             mainWidgetLayout->removeWidget(console);
             console->setHidden(true);
             break;
-        // remove figure window from layout and hide it
+        /* remove figure window from layout and hide it*/
         case 1:
             mainWidgetLayout->removeWidget(figure);
             figure->setHidden(true);
@@ -346,6 +473,11 @@ void MainWindow::beforeSwitchWindow()
 }
 
 
+/*
+ *@Desc: change current window,update other related widgets
+ *@Args: int windowId
+ *@Returns: None
+ */
 void MainWindow::switchWindow(int windowId)
 {
 
@@ -354,18 +486,22 @@ void MainWindow::switchWindow(int windowId)
     beforeSwitchWindow();
     switch(windowId)
     {
-        // render console window
-        case 0:
-            renderConsoleWindow();
-            break;
-        // render figure window
+        /* render figure window */
         case 1:
             renderFigureWindow();
+            currentWindowId = 1;
+            ui->figureWindowBtn->setDefault(true);
+            ui->consoleWindowBtn->setDefault(false);
             break;
+        /* render consonle window */
         default:
             renderConsoleWindow();
+            currentWindowId = 0;
+            ui->consoleWindowBtn->setDefault(true);
+            ui->figureWindowBtn->setDefault(false);
             break;
     }
+    updateMenuBar(currentWindowId);
 
 }
 

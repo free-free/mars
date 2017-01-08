@@ -61,8 +61,10 @@ private slots:
 
     void onConsoleWindowBtnClicked();
     void onFigureWindowBtnClicked();
+    void onConnectBtnClicked();
 
     void onConsoleDataReady();
+    void onConsolePlotDataRequest(MarsCommandLine * requestedObj);
 
 public:
     void renderConsoleWindow();

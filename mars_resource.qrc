@@ -15,5 +15,9 @@
         <file alias="delete-plot">resources/icon/delete-plot.png</file>
         <file alias="create-plot">resources/icon/create-plot.png</file>
         <file alias="connect-protocol">resources/icon/connect-protocol.png</file>
+        <file alias="plot">resources/icon/plot.png</file>
+        <file alias="earth-connected">resources/icon/earth-connected.png</file>
+        <file alias="terminal">resources/icon/terminal.png</file>
+        <file alias="earth-disconnected">resources/icon/earth-disconnected.png</file>
     </qresource>
 </RCC>

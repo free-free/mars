@@ -69,8 +69,7 @@ MarsCommandLine::MarsCommandLine(QWidget * parent, bool viewOnly,int maxIBufferS
     cmdStyle = new MarsCommandLine::Style(this);
     if(viewOnly)
         setReadOnly(true);
-    else
-        cursorNextLine();
+    cursorNextLine();
     setContextMenuPolicy(Qt::CustomContextMenu);
     out = new MarsBytesListBuffer(maxOBufferSize);
     in = new MarsBytesListBuffer(maxIBufferSize);
@@ -184,9 +183,13 @@ void MarsCommandLine::printData(QByteArray  data)
 {
     /* please implement me ,bitch*/
     if(data.isEmpty())
+    {
+        if(!isReadOnly())
+            cursorNextLine();
         return ;
-    cursorNextLine();
+    }
     insertPlainText(data);
+    cursorNextLine();
     out->append(data);
     scrollBar->setValue(this->blockCount());
 }
@@ -200,11 +203,16 @@ void MarsCommandLine::printData(QString data)
 {
 
     if(data.isEmpty())
+    {
+        if(!isReadOnly())
+            cursorNextLine();
         return ;
-    cursorNextLine();
+    }
     insertPlainText(data);
+    cursorNextLine();
     out->append(data);
     scrollBar->setValue(this->blockCount());
+
 }
 
 /**

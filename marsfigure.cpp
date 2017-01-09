@@ -124,7 +124,7 @@ void MarsFigure::initPlot()
 {
     plotLayout = new QGridLayout();
     layout->addLayout(plotLayout);
-    ploterContainer = new QList<QCustomPlot*>();
+    ploterContainer = new QList<MarsPlot*>();
     currentPloter = createPloter();
     plotState = false;
 }
@@ -132,13 +132,13 @@ void MarsFigure::initPlot()
 /**
  *@Desc: create ploter instance and config it ,finally append it to ploterContainter
  *@Args: None
- *@Returns: QCustomPlot *
+ *@Returns: MarsPlot *
  *
  */
-QCustomPlot* MarsFigure::createPloter()
+MarsPlot * MarsFigure::createPloter()
 {
 
-    QCustomPlot * tmpPloter;
+    MarsPlot * tmpPloter;
     // greater than max ploter number
     if(ploterContainer->length()>= MAX_PLOTER_NUMBER)
         return NULL;
@@ -154,7 +154,10 @@ QCustomPlot* MarsFigure::createPloter()
     // make left and bottom axes always transfer their ranges to right and top axes:
     connect(tmpPloter->xAxis, SIGNAL(rangeChanged(QCPRange)), tmpPloter->xAxis2, SLOT(setRange(QCPRange)));
     connect(tmpPloter->yAxis, SIGNAL(rangeChanged(QCPRange)), tmpPloter->yAxis2, SLOT(setRange(QCPRange)));
+    connect(tmpPloter, &MarsPlot::focusIn, this, &MarsFigure::changeCurrentPloterOnFocusIn);
     tmpPloter->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    tmpPloter->legend->setVisible(true);
+    tmpPloter->legend->setSelectableParts(QCPLegend::spItems);
     ploterContainer->append(tmpPloter);
     currentPloter = tmpPloter;
     arrangePloter();
@@ -198,7 +201,7 @@ void MarsFigure::updateStatusBar()
          createPloterAction->setEnabled(false);
     else
          createPloterAction->setEnabled(true);
-    /* readd ploterNameListBox */
+    /* update ploterNameListBox */
     disconnect(ploterNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentPloter(int)));
     ploterNameListBox->clear();
     for(int i =0;i<ploterContainer->length();i++)
@@ -247,6 +250,7 @@ void MarsFigure::startPlot()
 {
     plotState=true;
     int ploterNumber = ploterContainer->length();
+    /* replot all */
     for(int i=0;i<ploterNumber;++i)
     {
        ploterContainer->at(i)->replot();
@@ -362,7 +366,7 @@ void MarsFigure::plot(QByteArray & data)
  *@Desc:
  *  plot graph with string data
  *  string data formation:
- *      each data line end with '\n',each data line contains several ' ' characters as a seperator.
+ *      each data line end with '\n',each data line contains a space characters as a seperator.
  *
  *      generally speaking, it almost like the following formation:
  *              "x1 y^11 y^12 y^13"
@@ -405,7 +409,6 @@ void MarsFigure::plot(QString &data)
             currentPloter->graph(graphId)->rescaleAxes(false);
         }
     }
-
     for(int lineNumber=0;lineNumber<dataLines.length();++lineNumber)
     {
         dataLineItems = dataLines.at(lineNumber).split(" ");
@@ -428,7 +431,7 @@ void MarsFigure::plot(QString &data)
  *  Note !!!:
  *      The graphId starts from 0 ,the same as plotId.
  *      If you pass a graphId or plotId variable which's value is greater than 3, the result
- *      is not affect.
+ *      is no affected.
  *
  *@Args:
  *  double x, double y , int graphId(max graphId is 3), int plotId(max plotId is 3)
@@ -437,7 +440,7 @@ void MarsFigure::plot(QString &data)
  */
 void MarsFigure::plot(double x, double y, int graphId,int plotId)
 {
-    /* return back if plotState is false ,it indicate ploting stopped */
+    /* return back if plotState is false ,it indicates the plotting  is stopped */
     if (!plotState)
         return ;
     if((graphId+1)>MAX_GRAPH_NUMBER)
@@ -446,13 +449,13 @@ void MarsFigure::plot(double x, double y, int graphId,int plotId)
     {
         if(!createPloter())
             return ;
-        // recorrect plotId after create new ploter
+        // recorrect plotId after creating new ploter
         plotId = ploterContainer->length()-1;
     }
     if((graphId+1)>ploterContainer->at(plotId)->graphCount())
     {
         ploterContainer->at(plotId)->addGraph();
-        // recorrent graphId after create new graph in the current ploter
+        // recorrect graphId after creating new graph in the current ploter
         graphId = ploterContainer->at(plotId)->graphCount()-1;
         ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId)));
         ploterContainer->at(plotId)->graph(graphId)->rescaleAxes(false);
@@ -468,7 +471,7 @@ void MarsFigure::plot(double x, double y, int graphId,int plotId)
  *  Note !!!:
  *      The graphId start from 0 ,the same as plotId.
  *      If you pass a graphId or plotId variable which's value is greater than 3,
- *      the result is not affected.
+ *      the result is no affected.
  *@Args:
  *  QVector<double> &x,QVector<double> &y,int graphId(max graphId is 3),
  *  int plotId( max plotId is 3)
@@ -943,7 +946,16 @@ void MarsFigure::writeXMLFile(QFile * file)
 {
     /*
      * writing data into xml file.
-     * I also not decide to implement it at this time, it fuck me all the timea, son of bitch
+     * I also not decide to implement it at this time, it fucks me all the time, son of bitch
      */
 }
 
+
+void MarsFigure::changeCurrentPloterOnFocusIn(MarsPlot *focusInObj)
+{
+    int index = ploterContainer->indexOf(focusInObj);
+    if(index<0)
+        return ;
+    ploterNameListBox->setCurrentIndex(index);
+
+}

@@ -37,6 +37,7 @@ public slots:
     void showExportDataDialog();
     void showImportDataDialog();
     void saveGraph();
+    void changeCurrentPloterOnFocusIn(MarsPlot * focusInObj);
 
     void readTextFile(QFile * file);
     void writeTextFile(QFile *file);
@@ -58,7 +59,7 @@ public slots:
     void clearCurrentPlot();
     void onPlotActionTriggered();
     void changeCurrentPloter(int index);
-    QCustomPlot* createPloter();
+    MarsPlot* createPloter();
     void deletePloter();
 
 private:
@@ -90,8 +91,8 @@ private:
     QAction * deletePloterAction;
     QComboBox * ploterNameListBox;
 
-    QCustomPlot * currentPloter;
-    QList<QCustomPlot*> *ploterContainer;
+    MarsPlot * currentPloter;
+    QList<MarsPlot*> *ploterContainer;
     /*
      * plotState=true (start plot)
      * plotState=false (stop plot)

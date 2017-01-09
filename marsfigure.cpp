@@ -393,6 +393,8 @@ void MarsFigure::plot(QString &data)
      * if graph doesn't exist,then create it
      */
     int dataGraphNumber = dataLines.at(0).split(" ").length()-1;
+    if(dataGraphNumber>MAX_GRAPH_NUMBER)
+        dataGraphNumber = MAX_GRAPH_NUMBER;
     int existedGraphNumber = currentPloter->graphCount();
     if(dataGraphNumber>existedGraphNumber)
     {
@@ -403,15 +405,19 @@ void MarsFigure::plot(QString &data)
             currentPloter->graph(graphId)->rescaleAxes(false);
         }
     }
+
     for(int lineNumber=0;lineNumber<dataLines.length();++lineNumber)
     {
         dataLineItems = dataLines.at(lineNumber).split(" ");
+        if(dataLineItems.length()<=1)
+            continue;
         x = dataLineItems.at(0).toDouble();
-        for(int graphId =0; graphId<dataLineItems.length()-1;++graphId)
+        for(int graphId =0; graphId<dataGraphNumber;++graphId)
         {
              y = dataLineItems.at(graphId+1).toDouble();
              currentPloter->graph(graphId)->addData(x,y);
         }
+
     }
     currentPloter->replot();
 
@@ -434,6 +440,8 @@ void MarsFigure::plot(double x, double y, int graphId,int plotId)
     /* return back if plotState is false ,it indicate ploting stopped */
     if (!plotState)
         return ;
+    if((graphId+1)>MAX_GRAPH_NUMBER)
+        plotId += 1;
     if((ploterContainer->length()-1)<plotId)
     {
         if(!createPloter())
@@ -473,6 +481,8 @@ void MarsFigure::plot(QVector<double> &x, QVector<double> &y, int graphId,int pl
     /* return back if plotState is false ,it indicate ploting stopped */
     if (!plotState)
         return ;
+    if((graphId+1)>MAX_GRAPH_NUMBER)
+            plotId += 1;
     if((ploterContainer->length()-1)<plotId)
     {
         if(!createPloter())
@@ -503,6 +513,8 @@ void MarsFigure::plot(QVector<double> &x, QVector<double> &y, int graphId)
 
     /* return back if plotState is false ,it indicate ploting stopped */
     if (!plotState)
+        return ;
+    if((graphId+1)>MAX_GRAPH_NUMBER)
         return ;
     if((graphId+1)>currentPloter->graphCount())
     {

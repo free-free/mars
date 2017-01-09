@@ -77,6 +77,7 @@ private:
 private:
     const int MAX_PLOTER_NUMBER = 4;
     const int MIN_PLOTER_NUMBER = 1;
+    const int MAX_GRAPH_NUMBER = 4;
     QVBoxLayout * layout;
     QGridLayout * plotLayout;
     QToolBar * toolBar;

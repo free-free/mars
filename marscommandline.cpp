@@ -65,7 +65,8 @@ QTextStream & operator>>(QTextStream & in,QList<QByteArray> *list)
 
 MarsCommandLine::MarsCommandLine(QWidget * parent, bool viewOnly,int maxIBufferSize, int maxOBufferSize):QPlainTextEdit(parent)
 {
- //   document()->setMaximumBlockCount(100);
+
+
     cmdStyle = new MarsCommandLine::Style(this);
     if(viewOnly)
         setReadOnly(true);

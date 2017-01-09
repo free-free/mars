@@ -453,7 +453,13 @@ void MarsConsole::readTextFile(QFile * file)
 void MarsConsole::writeTextFile(QFile * file)
 {
     QTextStream stream(file);
-    stream<<currentCmdLine->outputBufferText();
+    int dataSize = currentCmdLine->outputBuffer()->length();
+    QStringList dataList;
+    for(int i =0;i<dataSize;i++)
+    {
+        dataList.append(QString::number(i)+' '+currentCmdLine->outputBuffer()->at(i));
+    }
+    stream<<dataList.join('\n');
 }
 
 /**

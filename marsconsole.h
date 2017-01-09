@@ -48,7 +48,7 @@ public slots:
     MarsCommandLine* createCmdLine(bool viewOnly=false,int maxIBufferSize=500, int maxOBufferSize=1000);
     void clearCurrentCmdLine();
     void onCmdLineDataReady();
-    void onCmdLineFocusIn(MarsCommandLine * focusInObj);
+    void changeCurrentCmdLineOnFocusIn(MarsCommandLine * focusInObj);
     void onPlotDataActionTriggered();
 
 

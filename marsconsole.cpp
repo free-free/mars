@@ -16,7 +16,7 @@
 
 
 /**
- *@Desc: init gridlayout ,tool bar and command line
+ *@Desc: create layout, set layout styles and call initToolBar and initCmdLine method
  *@Args: QWidget *(parent ), bool(view only mode), int (max input buffer size), int(max output buffer size)
  *@Returns: None
  */
@@ -53,7 +53,8 @@ MarsConsole::~MarsConsole()
 
 
 /**
- *@Desc: init tool bar
+ *@Desc: init tool bar. creating tool bar instance and respective actions,adding action to tool bar,
+ *     connecting slots to signals
  *@Args: None
  *@Returns: None
  *
@@ -122,7 +123,8 @@ void MarsConsole::initCmdLine(bool viewOnly,int maxIBufferSize,int maxOBufferSiz
 }
 
 /**
- *@Desc: create command line,when create successfully return created command line , NULl otherwise
+ *@Desc: create command line,when creating successfully return created command line instance ,
+ *      NULL otherwise.
  *@Args:  bool(view only), int (command line max input buffer size)
  * , int(command line max output buffer size)
  *@Returns:MarsCommandLine *
@@ -137,7 +139,7 @@ MarsCommandLine* MarsConsole::createCmdLine(bool viewOnly,int maxIBufferSize, in
     connect(tmpCmdLine,&MarsCommandLine::dataExportRequest,this,&MarsConsole::showExportDataDialog);
     connect(tmpCmdLine,&MarsCommandLine::dataImportRequest,this,&MarsConsole::showImportDataDialog);
     connect(tmpCmdLine,&MarsCommandLine::dataIn,this,&MarsConsole::onCmdLineDataReady);
-    connect(tmpCmdLine,&MarsCommandLine::focusIn,this,&MarsConsole::onCmdLineFocusIn);
+    connect(tmpCmdLine,&MarsCommandLine::focusIn,this,&MarsConsole::changeCurrentCmdLineOnFocusIn);
     cmdLineContainer->append(tmpCmdLine);
     currentCmdLine = tmpCmdLine;
     arrangeCommandLine();
@@ -226,18 +228,15 @@ void MarsConsole::clearCurrentCmdLine()
  *@Args: MarsCommandLine * focusInObj
  *@Returns: None
  */
-void MarsConsole::onCmdLineFocusIn(MarsCommandLine * focusInObj)
+void MarsConsole::changeCurrentCmdLineOnFocusIn(MarsCommandLine * focusInObj)
 {
-    int focusInObjIndex = cmdLineContainer->indexOf(focusInObj);
-    changeCurrentCmdLine(focusInObjIndex);
-    disconnect(cmdLineNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentCmdLine(int)));
-    cmdLineNameListBox->setCurrentIndex(focusInObjIndex);
-    connect(cmdLineNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentCmdLine(int)));
-
+    int index = cmdLineContainer->indexOf(focusInObj);
+    cmdLineNameListBox->setCurrentIndex(index);
 }
 
 /**
- *@Desc: slot method for plotDataAction(emit plotDataRequest signal)
+ *@Desc: slot method for plotDataAction triggered signal,
+ *          actually emiting plotDataRequest signal
  *@Args: None
  *@Returns: None
  */
@@ -246,7 +245,7 @@ void MarsConsole::onPlotDataActionTriggered()
      emit plotDataRequest(currentCmdLine);
 }
 /**
- *@Desc: layout command line in console window
+ *@Desc: layout command line in console window according to number of command line
  *@Args: None
  *@Returns: None
  */
@@ -285,7 +284,7 @@ void MarsConsole::arrangeCommandLine()
 }
 
 /**
- *@Desc: resolving the specific command line instance reference
+ *@Desc: resolving the specific command line instance's pointer
  *@Args: int( command line instance index)
  *@Return: MarsCommandLine &
  */
@@ -298,7 +297,8 @@ MarsCommandLine * MarsConsole::commandLine(int index)
     return cmdLineContainer->at(index);
 }
 /**
- *@Desc: slot method for command line's dataReady signal(emit dataReady signal)
+ *@Desc: slot method for command line's dataReady signal,
+ *    emit dataReady signal inside
  *@Args: None
  *@Returns: None
  */
@@ -308,7 +308,7 @@ void MarsConsole::onCmdLineDataReady()
 }
 
 /**
- *@Desc: slot method for showing exportion data dialog
+ *@Desc: show exportation data dialog
  *@Args: None
  *@Returns: None
  */
@@ -328,7 +328,7 @@ void MarsConsole::showExportDataDialog()
 }
 
 /**
- *@Desc:  writting console output buffer's data into file
+ *@Desc:  write console output buffer's data into file
  *@Args: QString file name
  *@Returns: None
  */
@@ -368,7 +368,7 @@ void MarsConsole::writeFile(QString fileName)
     }
 }
 /**
- *@Desc: slot function for loading file data into command line input buffer
+ *@Desc: show importation data dialog
  *@Args: None
  *@Returns: None
  */
@@ -455,6 +455,9 @@ void MarsConsole::writeTextFile(QFile * file)
     QTextStream stream(file);
     int dataSize = currentCmdLine->outputBuffer()->length();
     QStringList dataList;
+    /* gernerating xaxis value and cascading x axis value and y axis value
+     *    with one space character as seperator.
+     */
     for(int i =0;i<dataSize;i++)
     {
         dataList.append(QString::number(i)+' '+currentCmdLine->outputBuffer()->at(i));
@@ -493,7 +496,7 @@ void MarsConsole::readJSONFile(QFile *file)
         }
         input.append('\n');
     }
-     *currentCmdLine<<input;
+    *currentCmdLine<<input;
 }
 
 /**
@@ -627,7 +630,7 @@ void MarsConsole::writeDatFile(QFile *file)
  */
 void MarsConsole::readXMLFile(QFile * file)
 {
-
+    /* I think xml implementation will be delayed at this time */
 }
 
 /**
@@ -637,11 +640,11 @@ void MarsConsole::readXMLFile(QFile * file)
  */
 void MarsConsole::writeXMLFile(QFile * file)
 {
-
+     /* I think xml implementation will be delayed at this time */
 }
 
 /**
- *@Desc: return error instance
+ *@Desc: create a MarsError instance and fill it ,finally return it
  *@Args:  QString ,MarsErrorLevel
  *@Returns: MarsError
  */

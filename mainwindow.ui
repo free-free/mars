@@ -234,8 +234,8 @@ QPushButton:default{
             <string/>
            </property>
            <property name="icon">
-            <iconset>
-             <normaloff>:/icon/earch-disconnected</normaloff>:/icon/earch-disconnected</iconset>
+            <iconset resource="mars_resource.qrc">
+             <normaloff>:/icon/earth-disconnected</normaloff>:/icon/earth-disconnected</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -365,29 +365,60 @@ QPushButton:default{
      <x>0</x>
      <y>0</y>
      <width>629</width>
-     <height>48</height>
+     <height>26</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="styleSheet">
-    <string notr="true">/*
-QMenuBar {
-      height:40px;
+    <string notr="true">QMenuBar{
+					padding-top:0px;
+                 padding-bottom:0px;
+                 background-color:#ccc;
+					height:26px;
 }
 
-QMenuBar::item {
-     spacing:0px;
-    padding:1px 1px 1px 1px;
+QMenuBar::item{
+				 margin: 0px 0px 0px 0px;
+       		  background-color:#ccc;   
+                color:#555; 
+                padding:0px 10px 0px 10px;
+}
+QMenuBar::item:pressed{
+				background-color:#666;
+		       color:#efefef;
+}
+/*
+QMenu{
+                   background-color:#555;
+                   border:0px 0px 0px 0px;
+                   color:#f1f1f1;
 }
 */
 /*
-QMenuBar::item:selected { 
+QMenu::item{
+                 padding:3px 50px;
+                    margin:0px 0px 0px 0px;
+                    font-weight:400;
+                }
+QMenu::item:tearoff{
+                    color:#efefef;
 }
-
-QMenuBar::item:pressed {
-   
+*/
+QMenu::separator {
+                    height: 1px;
 }
-
-*/</string>
+QMenu::item:selected{
+                    background-color:#ff9900;
+}
+QMenu::item::pressed{
+                    background-color:#ff9900;
+}
+</string>
    </property>
    <property name="nativeMenuBar">
     <bool>false</bool>

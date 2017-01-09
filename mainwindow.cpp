@@ -31,7 +31,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainWidget->setLayout(mainWidgetLayout);
     console = NULL;
     figure = NULL;
-    renderConsoleWindow();
+    //renderConsoleWindow();
+    switchWindow(0);
     initConnections();
     onSerialPortClosed();
 }
@@ -461,11 +462,15 @@ void MainWindow::beforeSwitchWindow()
     {
         /* remove console window from layout and hide it */
         case 0:
+            if(!console)
+                return ;
             mainWidgetLayout->removeWidget(console);
             console->setHidden(true);
             break;
         /* remove figure window from layout and hide it*/
         case 1:
+            if(!figure)
+                return ;
             mainWidgetLayout->removeWidget(figure);
             figure->setHidden(true);
             break;
@@ -481,8 +486,6 @@ void MainWindow::beforeSwitchWindow()
 void MainWindow::switchWindow(int windowId)
 {
 
-    if(currentWindowId == windowId)
-        return ;
     beforeSwitchWindow();
     switch(windowId)
     {
@@ -502,7 +505,6 @@ void MainWindow::switchWindow(int windowId)
             break;
     }
     updateMenuBar(currentWindowId);
-
 }
 
 

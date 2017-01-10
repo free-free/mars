@@ -55,7 +55,6 @@ public:
     void enableViewOnly(bool ro);
     void cursorNextLine(const QString &ps);
     void cursorNextLine();
-    int  cursorColumnNumber() const ;
     MarsError errorInstance(QString msg, MarsErrorLevel=INFO);
     MarsCommandLine::Style * style();
     MarsCommandLine & operator <<(const QByteArray &data);

@@ -11,6 +11,7 @@
 #include <QTextStream>
 #include <QScrollBar>
 #include "marsbyteslistbuffer.h"
+#include <QTextBlock>
 
 
 
@@ -344,17 +345,6 @@ MarsCommandLine & MarsCommandLine::operator >>(QTextStream & dataReceiver)
     return *this;
 }
 /**
- *@Desc:  return the cursor column number that is different to textCursor's columnNumber
- *       !!!! this cursor column number
- *          is equal to  textCursor'scolumnNumber minus prompt's length;
- *@Args: None
- *@Return: int
- */
-int MarsCommandLine::cursorColumnNumber() const
-{
-    return (textCursor().columnNumber()-cmdStyle->promptLength());
-}
-/**
  *@Desc: set view only mode ( or read only mode)
  *@Args: bool
  *@Returns: None
@@ -376,6 +366,9 @@ void MarsCommandLine::keyPressEvent(QKeyEvent *e)
     }
     //currentRowNumber = textCursor().blockNumber();
     //totalRowCount = blockCount();
+    //qDebug()<<"block number:"<<textCursor().blockNumber();
+    //qDebug()<<"block count:"<<blockCount();
+    //qDebug()<<"line count:"<<document()->lineCount();
     if(textCursor().blockNumber()<(blockCount()-1))
     {
         switch(e->key())
@@ -405,21 +398,23 @@ void MarsCommandLine::keyPressEvent(QKeyEvent *e)
                         inputKeyBuffer.clear();
                     }
                     cursorNextLine();
+
                 break;
             case Qt::Key_Left:
-                if(cursorColumnNumber()>0)
+                if(textCursor().positionInBlock()>style()->promptLength())
                     QPlainTextEdit::keyPressEvent(e);
                 break;
-            case Qt::Key_Backspace: // prevent backspace key from deleting  prompt
-                if(cursorColumnNumber()>0)
+            /* prevent backspace key from deleting  prompt */
+            case Qt::Key_Backspace:
+                if(textCursor().positionInBlock()>style()->promptLength())
                 {
                     QPlainTextEdit::keyPressEvent(e);
                     if(!inputKeyBuffer.isEmpty())
-                        inputKeyBuffer.remove(cursorColumnNumber(),1);
+                        inputKeyBuffer.remove(inputKeyBuffer.length()-1,1);
                 }
                 break;
+            /* append key value  to inputBuffer */
             default:
-            // append key value  to inputBuffer;
                 inputKeyBuffer.append(e->text());
                 QPlainTextEdit::keyPressEvent(e);
                 break;
@@ -434,6 +429,7 @@ void MarsCommandLine::mousePressEvent(QMouseEvent *e)
     /* i have a little sad */
     setFocus();
     QPlainTextEdit::mousePressEvent(e);
+
 
 }
 

@@ -381,48 +381,43 @@ void MarsFigure::plot(QByteArray & data)
 void MarsFigure::plot(QString &data)
 {
 
-     QStringList dataLineItems;
-     QStringList dataLines;
-     double x,y;
-    /* ploting stopped */
-    if(!plotState)
+    if (!plotState)
         return ;
-    /* check data empty */
-    if (data.isEmpty())
+    QStringList dataLines;
+    QStringList dataLineItems;
+    dataLines = data.split("\n");
+    int dataSize = dataLines.length();
+    if(dataSize == 0)
         return ;
-    dataLines = data.split('\n');
-    if(dataLines.length()==0)
-        return ;
-    /*
-     * if graph doesn't exist,then create it
-     */
-    int dataGraphNumber = dataLines.at(0).split(" ").length()-1;
-    if(dataGraphNumber>MAX_GRAPH_NUMBER)
-        dataGraphNumber = MAX_GRAPH_NUMBER;
-    int existedGraphNumber = currentPloter->graphCount();
-    if(dataGraphNumber>existedGraphNumber)
+    QVector<double> x;
+    QList<QVector<double>*> y;
+    int dataGraphNum = dataLines.at(0).split(' ').length() - 1;
+    for(int i = 0; i < dataGraphNum; i++)
     {
-        for(int graphId=existedGraphNumber; graphId<dataGraphNumber;++graphId)
-        {
-            currentPloter->addGraph();
-            currentPloter->graph(graphId)->setPen(QPen(graphColor(graphId)));
-            currentPloter->graph(graphId)->rescaleAxes(false);
-        }
+        y.append(new QVector<double>());
     }
-    for(int lineNumber=0;lineNumber<dataLines.length();++lineNumber)
+    for(int i = 0; i < dataSize; i++)
     {
-        dataLineItems = dataLines.at(lineNumber).split(" ");
+        dataLineItems = dataLines.at(i).split(' ');
         if(dataLineItems.length()<=1)
             continue;
-        x = dataLineItems.at(0).toDouble();
-        for(int graphId =0; graphId<dataGraphNumber;++graphId)
+        x.append(dataLineItems.at(0).toDouble());
+        for( int j = 0; j< dataGraphNum; j++)
         {
-             y = dataLineItems.at(graphId+1).toDouble();
-             currentPloter->graph(graphId)->addData(x,y);
+            y.at(j)->append(dataLineItems.at(j+1).toDouble());
         }
+    }
+
+    int graphId = 0;
+    int plotId = 0;
+    for(int i = 0; i < dataGraphNum; i++)
+    {
+        plotId = ceil(i/MAX_PLOTER_NUMBER);
+        graphId = i%MAX_GRAPH_NUMBER;
+        plot(x, *y.at(i), graphId , plotId);
+        delete y.at(i);
 
     }
-    currentPloter->replot();
 
 }
 /**

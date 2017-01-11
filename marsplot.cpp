@@ -11,7 +11,8 @@
 MarsPlot::MarsPlot(QWidget * parent):QCustomPlot(parent)
 {
     /* hi,buddy you can fuck here */
-    QCPTextElement *title = new QCPTextElement(this, "Graph Title",
+    titleText = "Graph Title";
+    QCPTextElement *title = new QCPTextElement(this, titleText,
           QFont("sans",14));
     this->plotLayout()->insertRow(0);
     this->plotLayout()->addElement(0, 0, title);
@@ -21,6 +22,8 @@ MarsPlot::MarsPlot(QWidget * parent):QCustomPlot(parent)
             this, &MarsPlot::changeAxisLabelName);
     connect(title, &QCPTextElement::doubleClicked,
             this, &MarsPlot::changeTitle);
+    connect(this, &MarsPlot::mouseMove,
+            this, &MarsPlot::onMouseMove);
 }
 
 
@@ -86,7 +89,8 @@ void MarsPlot::changeTitle(QMouseEvent * event)
             tr("New Title:"),QLineEdit::Normal,title->text(),&ok);
         if(ok)
         {
-            title->setText(newTitle);
+            titleText = newTitle;
+            title->setText(titleText);
             this->replot();
         }
     }
@@ -134,3 +138,25 @@ void MarsPlot::changeAxisLabelName(QCPAxis * axis,QCPAxis::SelectablePart part)
     }
 }
 
+
+
+void MarsPlot::onMouseMove(QMouseEvent * event)
+{
+    double key, value ;
+    QPointF pos(event->x(),event->y());
+    QString data;
+    if(plottableAt(pos))
+    {
+
+        plottableAt(pos)->pixelsToCoords(pos, key, value);
+        data="x: "+QString::number(key)+" y: "+QString::number(value);
+    }
+    else
+    {
+        data = titleText;
+    }
+    QCPTextElement * title = (QCPTextElement*)this->plotLayout()->element(0,0);
+    title->setText(data);
+    this->replot();
+
+}

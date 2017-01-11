@@ -18,9 +18,13 @@ protected slots:
    void changeGraphLegendName(QCPLegend *legend, QCPAbstractLegendItem *item);
    void changeAxisLabelName(QCPAxis * axis,QCPAxis::SelectablePart);
    void changeTitle(QMouseEvent * event);
+   void onMouseMove(QMouseEvent * event);
 
 signals:
    void focusIn(MarsPlot * focusInObj);
+
+private:
+   QString titleText;
 
 
 };

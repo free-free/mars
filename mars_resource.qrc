@@ -19,5 +19,6 @@
         <file alias="earth-connected">resources/icon/earth-connected.png</file>
         <file alias="terminal">resources/icon/terminal.png</file>
         <file alias="earth-disconnected">resources/icon/earth-disconnected.png</file>
+        <file alias="mars">resources/icon/mars.png</file>
     </qresource>
 </RCC>

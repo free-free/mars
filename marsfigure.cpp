@@ -143,19 +143,21 @@ MarsPlot * MarsFigure::createPloter()
     if(ploterContainer->length()>= MAX_PLOTER_NUMBER)
         return NULL;
     tmpPloter = new MarsPlot(this);
-    tmpPloter->xAxis2->setVisible(true);
-    tmpPloter->xAxis2->setTickLabels(false);
-    tmpPloter->yAxis2->setVisible(true);
-    tmpPloter->yAxis2->setTickLabels(false);
+    //tmpPloter->xAxis2->setVisible(true);
+    //tmpPloter->xAxis2->setTickLabels(false);
+    //tmpPloter->yAxis2->setVisible(true);
+    //tmpPloter->yAxis2->setTickLabels(false);
     tmpPloter->xAxis->setLabel("x");
     tmpPloter->xAxis->setLabelPadding(0);
     tmpPloter->yAxis->setLabel("y");
     tmpPloter->yAxis->setLabelPadding(0);
     // make left and bottom axes always transfer their ranges to right and top axes:
-    connect(tmpPloter->xAxis, SIGNAL(rangeChanged(QCPRange)), tmpPloter->xAxis2, SLOT(setRange(QCPRange)));
-    connect(tmpPloter->yAxis, SIGNAL(rangeChanged(QCPRange)), tmpPloter->yAxis2, SLOT(setRange(QCPRange)));
+    //connect(tmpPloter->xAxis, SIGNAL(rangeChanged(QCPRange)), tmpPloter->xAxis2, SLOT(setRange(QCPRange)));
+    //connect(tmpPloter->yAxis, SIGNAL(rangeChanged(QCPRange)), tmpPloter->yAxis2, SLOT(setRange(QCPRange)));
     connect(tmpPloter, &MarsPlot::focusIn, this, &MarsFigure::changeCurrentPloterOnFocusIn);
     tmpPloter->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    tmpPloter->yAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
+    tmpPloter->xAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
     tmpPloter->legend->setVisible(true);
     tmpPloter->legend->setSelectableParts(QCPLegend::spItems);
     ploterContainer->append(tmpPloter);
@@ -453,10 +455,51 @@ void MarsFigure::plot(double x, double y, int graphId,int plotId)
         // recorrect graphId after creating new graph in the current ploter
         graphId = ploterContainer->at(plotId)->graphCount()-1;
         ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId)));
-        ploterContainer->at(plotId)->graph(graphId)->rescaleAxes(false);
+
     }
     ploterContainer->at(plotId)->graph(graphId)->addData(x,y);
-    ploterContainer->at(plotId)->xAxis->setRange(x+10,100,Qt::AlignRight);
+    ploterContainer->at(plotId)->xAxis->setRange(x+40,300,Qt::AlignRight);
+    ploterContainer->at(plotId)->yAxis->rescale(false);
+    ploterContainer->at(plotId)->replot();
+}
+
+void MarsFigure::plot(double y , int graphId, int plotId)
+{
+    double x;
+    /* return back if plotState is false ,it indicates the plotting  is stopped */
+    if (!plotState)
+        return ;
+    if((graphId+1)>MAX_GRAPH_NUMBER)
+        plotId += 1;
+    if((ploterContainer->length()-1)<plotId)
+    {
+        if(!createPloter())
+            return ;
+        // recorrect plotId after creating new ploter
+        plotId = ploterContainer->length()-1;
+    }
+
+    if((graphId+1)>ploterContainer->at(plotId)->graphCount())
+    {
+        ploterContainer->at(plotId)->addGraph();
+        // recorrect graphId after creating new graph in the current ploter
+        graphId = ploterContainer->at(plotId)->graphCount()-1;
+        ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId)));
+    }
+
+    if(ploterContainer->at(plotId)->graph(graphId)>0)
+    {
+        int dataCount = ploterContainer->at(plotId)->graph(graphId)->dataCount();
+        if(dataCount > 0 )
+            x = ploterContainer->at(plotId)->graph(graphId)->dataMainKey(dataCount-1)+1;
+        else
+            x = 0.0;
+    }
+    else
+        x = 0.0;
+    ploterContainer->at(plotId)->graph(graphId)->addData(x,y);
+    ploterContainer->at(plotId)->xAxis->setRange(x+40,300,Qt::AlignRight);
+    ploterContainer->at(plotId)->yAxis->rescale(false);
     ploterContainer->at(plotId)->replot();
 }
 
@@ -926,6 +969,7 @@ void MarsFigure::writeDatFile(QFile * file)
  */
 void MarsFigure::readXMLFile(QFile * file)
 {
+    Q_UNUSED(file);
     /*
      *
      * reading data from xml file.
@@ -939,6 +983,7 @@ void MarsFigure::readXMLFile(QFile * file)
  */
 void MarsFigure::writeXMLFile(QFile * file)
 {
+    Q_UNUSED(file);
     /*
      * writing data into xml file.
      * I also not decide to implement it at this time, it fucks me all the time, son of bitch

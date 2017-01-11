@@ -51,6 +51,7 @@ public slots:
     void plot(QList<QByteArray> &data);
     void plot(QByteArray &data);
     void plot(QString & data);
+    void plot(double y , int graphId, int plotId);
     void plot(double x, double y, int graphId=0, int plotId=0);
     void plot(QVector<double>& x, QVector<double> &y, int graphId,int plotId);
     void plot(QVector<double> &x, QVector<double> &y, int graphId);

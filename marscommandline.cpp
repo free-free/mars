@@ -1,4 +1,3 @@
-#include "marscommandline.h"
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QContextMenuEvent>
@@ -10,8 +9,10 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QScrollBar>
-#include "marsbyteslistbuffer.h"
 #include <QTextBlock>
+
+#include "marscommandline.h"
+#include "marsbyteslistbuffer.h"
 
 
 

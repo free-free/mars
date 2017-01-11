@@ -81,15 +81,35 @@ void MarsSerialPort::sendFileData(QFile & file)
 
 /*
  *@Desc: recv data from serial port
- *@Args: None
- *@Returns: QByteArray
+ *@Args: QByteArray &data
+ *@Returns: int (-1 (failed), 0 (success))
  *
  */
-QByteArray MarsSerialPort::recvRawData()
+int MarsSerialPort::recvRawData(QByteArray & data)
 {
     /* waiting you to fuck me */
-    QByteArray data =readAll();
-    return data;
+    QByteArray frame =readAll();
+    // drop data package length
+    if(frame.length() != 17)
+    {
+        return -1;
+    }
+    // drop frame header
+    if((unsigned char)frame.at(0) != 0xa0)
+    {
+        return -1;
+    }
+    // calculate check sum byte from 1 to 15
+    quint32 sum = 0;
+    for( int i = 1; i<16 ; i++)
+    {
+        sum += (unsigned char)frame.at(i);
+    }
+    // checking sum failed
+    if(sum%256 != (unsigned char)frame.at(16))
+        return -1;
+    data = frame.mid(2, 15);
+    return 0;
 }
 
 /*

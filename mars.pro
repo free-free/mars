@@ -42,3 +42,5 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     mars_resource.qrc
+
+RC_FILE += application.rc

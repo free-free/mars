@@ -428,9 +428,15 @@ void MarsCommandLine::mousePressEvent(QMouseEvent *e)
 {
    // Q_UNUSED(e);
     /* i have a little sad */
-    setFocus();
-    QPlainTextEdit::mousePressEvent(e);
-
+    //setFocus();
+    if(e->button()==Qt::RightButton)
+    {
+        QPlainTextEdit::mousePressEvent(e);
+    }
+    else
+    {
+        Q_UNUSED(e);
+    }
 
 }
 

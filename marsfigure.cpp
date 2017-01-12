@@ -458,8 +458,10 @@ void MarsFigure::plot(double x, double y, int graphId,int plotId)
 
     }
     ploterContainer->at(plotId)->graph(graphId)->addData(x,y);
-    ploterContainer->at(plotId)->xAxis->setRange(x+40,300,Qt::AlignRight);
-    ploterContainer->at(plotId)->yAxis->rescale(false);
+    double xRange = ploterContainer->at(plotId)->xMaxRange();
+    double yRange = ploterContainer->at(plotId)->yMaxRange();
+    ploterContainer->at(plotId)->xAxis->setRange(x+xRange/8, xRange, Qt::AlignRight);
+    ploterContainer->at(plotId)->yAxis->setRange(-yRange, yRange);
     ploterContainer->at(plotId)->replot();
 }
 
@@ -498,8 +500,10 @@ void MarsFigure::plot(double y , int graphId, int plotId)
     else
         x = 0.0;
     ploterContainer->at(plotId)->graph(graphId)->addData(x,y);
-    ploterContainer->at(plotId)->xAxis->setRange(x+40,300,Qt::AlignRight);
-    ploterContainer->at(plotId)->yAxis->rescale(false);
+    double xRange = ploterContainer->at(plotId)->xMaxRange();
+    double yRange = ploterContainer->at(plotId)->yMaxRange();
+    ploterContainer->at(plotId)->xAxis->setRange(x+xRange/8, xRange, Qt::AlignRight);
+    ploterContainer->at(plotId)->yAxis->setRange(-yRange, yRange);
     ploterContainer->at(plotId)->replot();
 }
 

@@ -13,6 +13,8 @@ public:
     ~MarsPlot();
    void wheelEvent (QWheelEvent *event);
    void focusInEvent(QFocusEvent*event);
+   double xMaxRange() const;
+   double yMaxRange() const;
 
 protected slots:
    void changeGraphLegendName(QCPLegend *legend, QCPAbstractLegendItem *item);
@@ -25,7 +27,8 @@ signals:
 
 private:
    QString titleText;
-
+   double xMaxRangeValue;
+   double yMaxRangeValue;
 
 };
 

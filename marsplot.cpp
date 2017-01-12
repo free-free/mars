@@ -24,6 +24,8 @@ MarsPlot::MarsPlot(QWidget * parent):QCustomPlot(parent)
             this, &MarsPlot::changeTitle);
     connect(this, &MarsPlot::mouseMove,
             this, &MarsPlot::onMouseMove);
+    xMaxRangeValue = 300;
+    yMaxRangeValue = 20;
 }
 
 
@@ -50,11 +52,31 @@ void MarsPlot::wheelEvent(QWheelEvent *event)
     if(QApplication::queryKeyboardModifiers().testFlag(Qt::ControlModifier))
     {
          axisRect()->setRangeZoom(Qt::Horizontal);
+         if(event->delta()>0)
+         {
+            xMaxRangeValue -= 5.0;
+            if(xMaxRangeValue < 0)
+                xMaxRangeValue = 0;
+         }
+         else
+         {
+            xMaxRangeValue += 5.0;
+         }
     }
     else if(QApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier))
     {
 
          axisRect()->setRangeZoom(Qt::Vertical);
+         if(event->delta()>0)
+         {
+            yMaxRangeValue -= 0.3;
+            if(yMaxRangeValue < 0)
+                yMaxRangeValue = 0;
+         }
+         else
+         {
+            yMaxRangeValue += 0.3;
+         }
     }
     else
     {
@@ -139,7 +161,11 @@ void MarsPlot::changeAxisLabelName(QCPAxis * axis,QCPAxis::SelectablePart part)
 }
 
 
-
+/**
+ *@Desc: display x value and y value in title area when mouse is moving
+ *@Args: QMouseEvent * event
+ *@Return: None
+ */
 void MarsPlot::onMouseMove(QMouseEvent * event)
 {
     double key, value ;
@@ -159,4 +185,24 @@ void MarsPlot::onMouseMove(QMouseEvent * event)
     title->setText(data);
     this->replot();
 
+}
+
+/*
+ *@Desc: return x axis max range value
+ *@Args: None
+ *@Returns: None
+ */
+double MarsPlot::xMaxRange() const
+{
+    return xMaxRangeValue ;
+}
+
+/*
+ *@Desc: return y axis max range value
+ *@Args: None
+ *@Returns: None
+ */
+double MarsPlot::yMaxRange() const
+{
+    return yMaxRangeValue;
 }

@@ -190,6 +190,13 @@ SerialPortSettings SPSettingsDialog::settings() const
 }
 
 
+int SPSettingsDialog::exec()
+{
+    fillSerialPortParameters();
+    fillSerialPortInfo();
+    storeSettings();
+    return QDialog::exec();
+}
 
 
 

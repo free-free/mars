@@ -20,6 +20,7 @@ public:
     explicit SPSettingsDialog(QWidget *parent = 0);
     ~SPSettingsDialog();
     SerialPortSettings settings() const;
+    int exec();
 
 signals:
     void updated(SerialPortSettings settings);

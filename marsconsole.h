@@ -36,8 +36,6 @@ public slots:
     void writeFile(QString fileName);
     void readTextFile(QFile * file);
     void writeTextFile(QFile *file);
-    void readXMLFile(QFile * file);
-    void writeXMLFile(QFile * file);
     void readJSONFile(QFile * file);
     void writeJSONFile(QFile* file);
     void readDatFile(QFile * file);

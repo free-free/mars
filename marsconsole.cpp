@@ -315,7 +315,7 @@ void MarsConsole::onCmdLineDataReady()
 void MarsConsole::showExportDataDialog()
 {
     QString fileName = QFileDialog::getSaveFileName(this,tr("保存为....."),QString(),
-          tr("*.txt files(*.txt);;*.json files(*.json);;*.dat files(*.dat);; *.xml files(*.xml)"));
+          tr("*.txt files(*.txt);;*.json files(*.json);;*.dat files(*.dat);;"));
     if(fileName.isEmpty())
     {
         emit errors(errorInstance(tr("文件名不能为空"),WARNING));
@@ -353,10 +353,6 @@ void MarsConsole::writeFile(QString fileName)
         {
             writeDatFile(&file);
         }
-        else if(fileType =="xml")
-        {
-            writeXMLFile(&file);
-        }
         else
         {
             writeTextFile(&file);
@@ -375,7 +371,7 @@ void MarsConsole::writeFile(QString fileName)
 void MarsConsole::showImportDataDialog()
 {
     QString fileName = QFileDialog::getOpenFileName(this,tr("导入文件"),QString(),
-            tr("*.txt files(*.txt);;*.json files(*.json);; *.dat files(*.dat);; *.xml files(*.xml)"));
+            tr("*.txt files(*.txt);;*.json files(*.json);; *.dat files(*.dat);;"));
     if(fileName.isEmpty())
     {
         emit errors(errorInstance(tr("文件名不能为空"),WARNING));
@@ -418,10 +414,6 @@ void MarsConsole::readFile(QString fileName)
         else if(fileType == "dat")
         {
             readDatFile(&file);
-        }
-        else if(fileType =="xml")
-        {
-            readXMLFile(&file);
         }
         else
         {
@@ -623,26 +615,6 @@ void MarsConsole::writeDatFile(QFile *file)
     file->write(saveDocument.toBinaryData());
     qDebug()<<"save data time(ms): "<<QDateTime::currentMSecsSinceEpoch()-startTime;
 }
-/**
- *@Desc: read xml file and import data into input buffer
- *@Args: QFile * file
- *@Returns: None
- */
-void MarsConsole::readXMLFile(QFile * file)
-{
-    /* I think xml implementation will be delayed at this time */
-}
-
-/**
- *@Desc: write output buffer's data into  file
- *@Args: QFile *file
- *@Returns: None
- */
-void MarsConsole::writeXMLFile(QFile * file)
-{
-     /* I think xml implementation will be delayed at this time */
-}
-
 /**
  *@Desc: create a MarsError instance and fill it ,finally return it
  *@Args:  QString ,MarsErrorLevel

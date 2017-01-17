@@ -14,18 +14,19 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
     spsettingsdialog.cpp \
     qcustomplot.cpp \
     marsbyteslistbuffer.cpp \
     marsconsole.cpp \
     marsserialport.cpp \
     marscommandline.cpp \
-    marsdatawidget.cpp \
     marsfigure.cpp \
-    marsplot.cpp
+    marsplot.cpp \
+    marsbytesqueue.cpp \
+    helper.cpp \
+    mars.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
     spsettingsdialog.h \
     marstypes.h \
     qcustomplot.h \
@@ -33,12 +34,15 @@ HEADERS  += mainwindow.h \
     marsconsole.h \
     marscommandline.h \
     marsserialport.h \
-    marsdatawidget.h \
     marsfigure.h \
-    marsplot.h
+    marsplot.h \
+    marsbytesqueue.h \
+    helper.h \
+    mars.h
 
-FORMS    += mainwindow.ui \
-    spsettingsdialog.ui
+FORMS    += \
+    spsettingsdialog.ui \
+    mars.ui
 
 RESOURCES += \
     mars_resource.qrc

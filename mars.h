@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MARS_H
+#define MARS_H
 
 #include <QMainWindow>
 #include <QtSerialPort/QSerialPortInfo>
@@ -15,16 +15,16 @@ class MarsFigure;
 class QTimer;
 
 namespace Ui {
-class MainWindow;
+class Mars;
 }
 
-class MainWindow : public QMainWindow
+class Mars : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit Mars(QWidget *parent = 0);
+    ~Mars();
 
 private:
     /*
@@ -35,36 +35,22 @@ private:
 private slots:
 
      // connect to aboutAction's triggered signal
-    void onAboutSoftwareActionTriggered();
-    //connect to clearScreenAction's  triggered signal
-    void onClearScreenActionTriggered();
-    //connect  to exporeFileAction's triggered signal
-    void onExportFileActionTriggered();
+    void showAboutSoftwareDialog();
     // error handler
-    void onApplicationError(MarsError  error);
-
+    void handleError(MarsError  error);
     /* serial port operation */
-    // connect to SPSettingDialog's updated signal
-    void onSerialPortSettingsUpdated(SerialPortSettings settings);
-    // connect to MarsSerialPort's openFailed signal
-    //void onSerialPortOpenFailed();
-    // connect to MarsSerialPort's closed signal
     void onSerialPortClosed();
-    // connect to MarsSerialPort's opened signal
     void onSerialPortOpened();
-    // connect to MarsSerialPort's dataReady signal
-    void onSerialPortDataReady();
-    // connect to serialPortProtocolDialogAction's triggered signal
-    void onSerialPortProtocolDialogActionTriggered();
-    // connect to serialPortConfigDialogAction's triggered signal
-    void onSerialPortConfigDialogActionTriggered();
-
-    void onConsoleWindowBtnClicked();
-    void onFigureWindowBtnClicked();
+    void sendConsoleData();
+    void showSerialPortProtocolDialog();
+    void showSerialPortSettingsDialog();
+    void showConsoleWindow();
+    void showFigureWindow();
     void onConnectBtnClicked();
-
-    void onConsoleDataReady();
-    void onConsolePlotDataRequest(MarsCommandLine * requestedObj);
+    void renderSerialPortData();
+    void plotConsoleData(MarsCommandLine * requestedObj);
+    void connectSerialPort();
+    void disconnectSerialPort();
 
 public:
     void renderConsoleWindow();
@@ -72,13 +58,13 @@ public:
     void switchWindow(int windowId);
     void updateMenuBar(int winId);
     void tickTask();
-private:
 
+private:
     void beforeSwitchWindow();
 
 private:
-    Ui::MainWindow *ui;
-    MarsSerialPort * devSerialPort;
+    Ui::Mars *ui;
+    MarsSerialPort * serialPort;
     SPSettingsDialog * serialPortSettingsDialog;
     MarsConsole * console;
     MarsFigure *  figure;

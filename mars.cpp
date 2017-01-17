@@ -1,5 +1,5 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "mars.h"
+#include "ui_mars.h"
 #include "spsettingsdialog.h"
 #include "marsserialport.h"
 #include "marscommandline.h"
@@ -7,6 +7,7 @@
 #include "marsfigure.h"
 #include "marsbyteslistbuffer.h"
 #include "qcustomplot.h"
+#include "helper.h"
 
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
@@ -18,30 +19,33 @@
 #include <QMessageBox>
 #include <QErrorMessage>
 
-MainWindow::MainWindow(QWidget *parent) :
+
+Mars::Mars(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::Mars)
 {
     ui->setupUi(this);
     mainWidgetLayout = new QGridLayout(ui->mainWidget);
     mainWidgetLayout->setSpacing(0);
     mainWidgetLayout->setContentsMargins(0,0,0,0);
     serialPortSettingsDialog = new SPSettingsDialog(this);
-    devSerialPort = new MarsSerialPort(serialPortSettingsDialog->settings(),this);
+    serialPort = new MarsSerialPort(serialPortSettingsDialog->settings(),this);
     ui->mainWidget->setLayout(mainWidgetLayout);
     console = NULL;
     figure = NULL;
-    //renderConsoleWindow();
     switchWindow(0);
     initConnections();
     onSerialPortClosed();
+    setWindowIcon(QIcon(":/icon/mars"));
+    setWindowTitle(tr("Mars"));
+    setWindowIconText(tr("Mars"));
 }
 
-MainWindow::~MainWindow()
+
+Mars::~Mars()
 {
     delete ui;
 }
-
 
 
 /*
@@ -49,150 +53,112 @@ MainWindow::~MainWindow()
  *@Args:None
  *@Returns:None
  */
-
-void MainWindow::onAboutSoftwareActionTriggered()
+void Mars::showAboutSoftwareDialog()
 {
-    /*.............*/
-}
-
-
-void MainWindow::onClearScreenActionTriggered()
-{
-    /*............*/
+    /*no implementation */
 }
 
 
 /*
- *@Desc: export data info file(*.jpg,*.xls,*.csv)
+ *@Desc: init Mars all signals to the respective slots
  *@Args:None
  *@Returns:None
  */
-void MainWindow::onExportFileActionTriggered()
+void Mars::initConnections()
 {
-    /*...........*/
+    connect(ui->connectSPAction, &QAction::triggered,
+            this, &Mars::connectSerialPort);
+    connect(ui->disconnectSPAction, &QAction::triggered,
+            this, &Mars::disconnectSerialPort);
+    connect(ui->connectBtn, &QPushButton::clicked,
+            this, &Mars::onConnectBtnClicked);
+    connect(serialPort, &MarsSerialPort::disconnected,
+            this, &Mars::onSerialPortClosed);
+    connect(serialPort, &MarsSerialPort::connected,
+            this, &Mars::onSerialPortOpened);
+    connect(serialPort, &MarsSerialPort::dataFrameReceived,
+            this, &Mars::renderSerialPortData);
+    connect(serialPort, &MarsSerialPort::errors,
+            this, &Mars::handleError);
+    connect(ui->serialPortConfigDialogAction, &QAction::triggered,
+            this, &Mars::showSerialPortSettingsDialog);
+    connect(ui->exitAppAction, &QAction::triggered,
+            this, &QApplication::exit);
+    connect(ui->consoleWindowBtn, &QPushButton::clicked,
+            this, &Mars::showConsoleWindow);
+    connect(ui->figureWindowBtn, &QPushButton::clicked,
+            this, &Mars::showFigureWindow);
 }
 
 
 /*
- *@Desc: init mainwindow all signals to the respective slots
- *@Args:None
- *@Returns:None
+ *@Desc: connect to serial port
+ *@Args: None
+ *@Returns: None
  */
-void MainWindow::initConnections()
+void Mars::connectSerialPort()
 {
-    connect(ui->connectSPAction,&QAction::triggered,devSerialPort,&MarsSerialPort::connect);
-    connect(ui->disconnectSPAction,&QAction::triggered,devSerialPort,&MarsSerialPort::disconnect);
-    connect(ui->connectBtn,&QPushButton::clicked,this,&MainWindow::onConnectBtnClicked);
-    connect(devSerialPort,&MarsSerialPort::disconnected,this,&MainWindow::onSerialPortClosed);
-    connect(devSerialPort,&MarsSerialPort::connected,this,&MainWindow::onSerialPortOpened);
-    connect(devSerialPort,&MarsSerialPort::readyRead,this,&MainWindow::onSerialPortDataReady);
-    connect(devSerialPort,&MarsSerialPort::errors,this,&MainWindow::onApplicationError);
-
-    connect(serialPortSettingsDialog,&SPSettingsDialog::updated,this,&MainWindow::onSerialPortSettingsUpdated);
-    connect(ui->serialPortConfigDialogAction,&QAction::triggered,this,&MainWindow::onSerialPortConfigDialogActionTriggered);
-    connect(ui->exitAppAction,&QAction::triggered,this,&QApplication::exit);
-
-    connect(ui->consoleWindowBtn,&QPushButton::clicked,this,&MainWindow::onConsoleWindowBtnClicked);
-    connect(ui->figureWindowBtn,&QPushButton::clicked,this, &MainWindow::onFigureWindowBtnClicked);
-
+    serialPort->connect(serialPortSettingsDialog->settings());
 }
+
+
+/*
+ *@Desc: disconnect from serial port
+ *@Args: None
+ *@Returns: None
+ */
+void Mars::disconnectSerialPort()
+{
+    serialPort->disconnect();
+}
+
 
 /*
  *@Desc:show serial port connection protocol dialog
  *@Args:None
  *@Returns:None
  */
-
-void MainWindow::onSerialPortProtocolDialogActionTriggered()
+void Mars::showSerialPortProtocolDialog()
 {
-    /* waiting you to fuck me */
+    /* no implementation */
 }
+
 
 /*
  *@Desc:show serial port  config dialog
  *@Args:None
  *@Returns:None
  */
-
-void MainWindow::onSerialPortConfigDialogActionTriggered()
+void Mars::showSerialPortSettingsDialog()
 {
-    /* waiting you to fuck me */
     serialPortSettingsDialog->exec();
 }
 
-/*
- *@Desc: error handler for all QWidget object
- *@Args: waiting to define
- *@Returns:None
- */
-void MainWindow::onApplicationError(MarsError  error)
-{
-
-    if(error.level==INFO)
-    {
-        QMessageBox::information(this, tr("information"),error.msg);
-    }
-    else if(error.level==DEBUG)
-    {
-
-    }
-    else if(error.level==WARNING)
-    {
-        QMessageBox msgBox(QMessageBox::Warning, tr("warning"),error.msg, 0, this);
-        msgBox.setDetailedText(error.msg);
-        msgBox.addButton(tr("&Continue"), QMessageBox::RejectRole);
-        if (msgBox.exec() == QMessageBox::RejectRole)
-             return;
-    }
-    else if(error.level==ERROR)
-    {
-        QErrorMessage errorMsg(this);
-        errorMsg.showMessage(error.msg);
-        errorMsg.exec();
-    }
-    else
-    {
-       QMessageBox::StandardButton reply;
-       reply = QMessageBox::critical(this, tr("critical"),
-             error.msg,QMessageBox::Abort | QMessageBox::Ignore);
-       if (reply == QMessageBox::Abort)
-           QApplication::instance()->quit();
-    }
-}
-
-/*
- *@Desc: handle SPSettingsDialog's updated signal
- *@Args: SerialPortSettings
- *@Returns: None
- */
-
-void MainWindow::onSerialPortSettingsUpdated(SerialPortSettings settings)
-{
-    devSerialPort->updateSettings(settings);
-}
 
 /*
  *@Desc: slot method for connectBtn clicked,connect to serial port or disconnect serial port
  *@Args: None
  *@Returns: None
  */
-void MainWindow::onConnectBtnClicked()
+void Mars::onConnectBtnClicked()
 {
-    if(devSerialPort->isOpen())
+    if(serialPort->isOpen())
     {
-        devSerialPort->disconnect();
+        disconnectSerialPort();
     }
     else
     {
-        devSerialPort->connect();
+        connectSerialPort();
     }
 }
+
+
 /*
- *@Desc: handler MarsSerialPort's opened signal
+ *@Desc: handler MarsSerialPort's connected signal
  *@Args: None
  *@Returns: None
  */
-void MainWindow::onSerialPortOpened()
+void Mars::onSerialPortOpened()
 {
     ui->connectSPAction->setEnabled(false);
     ui->serialPortConfigDialogAction->setEnabled(false);
@@ -201,12 +167,13 @@ void MainWindow::onSerialPortOpened()
     ui->connectBtn->setToolTip(tr("关闭串口"));
 }
 
+
 /*
- *@Desc: handler MarsSerialPort's closed signal
+ *@Desc: handler MarsSerialPort's disconnected signal
  *@Args: None
  *@Returns: None
  */
-void MainWindow::onSerialPortClosed()
+void Mars::onSerialPortClosed()
 {
     ui->serialPortConfigDialogAction->setEnabled(true);
     ui->connectSPAction->setEnabled(true);
@@ -215,34 +182,53 @@ void MainWindow::onSerialPortClosed()
     ui->connectBtn->setToolTip(tr("连接串口"));
 }
 
+
 /*
  *@Desc: handler MarsSerialPort's dataReady signal,
  *     read serial port data and send it to figure or console
  *@Args: None
  *@Returns: None
  */
-void MainWindow::onSerialPortDataReady()
+void Mars::renderSerialPortData()
 {
+    QByteArray data;
+    QString consoleStr;
+    // read data frame from serial frame queue
+    serialPort->readDataFrame(data);
+    if(data.isEmpty())
+        return ;
     switch(currentWindowId)
     {
-        /* read serial port data and send data to console */
         case 0:
+            // parse serial port data and send data to console
+            for (int i = 0 ; i < 4; i++)
+            {
+                consoleStr.append(QString::number(bytesToFloat(data.mid(1+i*4 ,4))));
+                consoleStr.append(' ');
+            }
+            *console->commandLine(1)<<consoleStr;
             break;
-        /* read serial port data and send data to figure */
         case 1:
+            // parse serial port data and send data to figure
+            for (int i = 0 ; i < 4; i++)
+            {
+                if(data.mid(1+i*4, 4).toHex()==QByteArray(0x00000000))
+                    break;
+                figure->plot(bytesToFloat(data.mid(1+i*4 ,4)), i, (unsigned char)data.at(0));
+            }
             break;
         default:
             break;
-
     }
 }
 
+
 /*
- *@Desc: slot for consoleWindowBtn's clicked signal, switch current window to console window
+ *@Desc: show console window
  *@Args: None
  *@Returns: None
  */
-void MainWindow::onConsoleWindowBtnClicked()
+void Mars::showConsoleWindow()
 {
     if(currentWindowId != 0)
     {
@@ -250,12 +236,13 @@ void MainWindow::onConsoleWindowBtnClicked()
     }
 }
 
+
 /*
- *@Desc: slot for figureWindowBtn's clicked signal, switch current window to figure window
+ *@Desc: show figure window;
  *@Args: None
  *@Returns: None
  */
-void MainWindow::onFigureWindowBtnClicked()
+void Mars::showFigureWindow()
 {
     if(currentWindowId != 1)
     {
@@ -263,24 +250,24 @@ void MainWindow::onFigureWindowBtnClicked()
     }
 }
 
+
 /*
- *@Desc: slot for console's dataReady signal,
- *   be responsible for sending console's data to serial port
+ *@Desc: be responsible for sending console's data to serial port
  *@Args: None
  *@Returns: None
  */
-void MainWindow::onConsoleDataReady()
+void Mars::sendConsoleData()
 {
     *(console->commandLine(0))>>*(console->commandLine(1));
 }
 
+
 /*
- *@Desc: slot for console's plotDataRequest signal,
- *   be responsible for parse console's data and plot it's graph in figure window
+ *@Desc: be responsible for parse console's data and plot it's graph in figure window
  *@Args: MarsCommandLine * requestedObj
  *@Returns: None
  */
-void MainWindow::onConsolePlotDataRequest(MarsCommandLine *requestedObj)
+void Mars::plotConsoleData(MarsCommandLine *requestedObj)
 {
     /* switch current window to figure window */
     switchWindow(1);
@@ -294,11 +281,14 @@ void MainWindow::onConsolePlotDataRequest(MarsCommandLine *requestedObj)
     /* calculate graph number */
     int dataGraphNum = requestedObj->outputBuffer()->at(0).split(' ').length();
     /* create container for y axis value  */
+
     for(int i =0;i<dataGraphNum;i++)
     {
         y.append(new QVector<double>());
     }
+
     /* parse data from console's command line data */
+
     for(int i = 0;i<dataSize;i++)
     {
         x.append(i);
@@ -310,6 +300,7 @@ void MainWindow::onConsolePlotDataRequest(MarsCommandLine *requestedObj)
     }
     int graphId = 0;
     int plotId = 0;
+
     /* starting plot */
     figure->startPlot();
     for(int i=0;i<dataGraphNum;i++)
@@ -325,44 +316,47 @@ void MainWindow::onConsolePlotDataRequest(MarsCommandLine *requestedObj)
 
 }
 
+
 /*
  *@Desc: create console window and connect signals to slots ,finally render it in top level
  *@Args: None
  *@Returns: None
  */
-void MainWindow::renderConsoleWindow()
+void Mars::renderConsoleWindow()
 {
-
     if(!console)
     {
+        //create MarsConsole instance
         console = new MarsConsole(ui->mainWidget,false,100000,100000);
         console->createCmdLine(true,100000,100000);
         tick = new QTimer(this);
-        tick->setInterval(1);
+        tick->setInterval(10);
         tick->start();
-        connect(tick,&QTimer::timeout,this,&MainWindow::tickTask);
-        connect(console->commandLine(0),&MarsCommandLine::dataIn,this,&MainWindow::onConsoleDataReady);
-        connect(console,&MarsConsole::errors,this,&MainWindow::onApplicationError);
-        connect(console,&MarsConsole::plotDataRequest,this,&MainWindow::onConsolePlotDataRequest);
+        // bing slots method to the related signal
+        connect(tick,&QTimer::timeout,this,&Mars::tickTask);
+        connect(console->commandLine(0),&MarsCommandLine::dataIn,this,&Mars::sendConsoleData);
+        connect(console,&MarsConsole::errors,this,&Mars::handleError);
+        connect(console,&MarsConsole::plotDataRequest,this,&Mars::plotConsoleData);
     }
     console->setHidden(false);
     mainWidgetLayout->addWidget(console,1,1);
-
-
 }
+
 
 /*
  *@Desc: create figure window and connect signals to slots ,finally render it in top level
  *@Args: None
  *@Returns: None
  */
-void MainWindow::renderFigureWindow()
+void Mars::renderFigureWindow()
 {
 
     if(!figure)
     {
+        // create MarsFigure instance
         figure = new MarsFigure(ui->mainWidget);
-        connect(figure,&MarsFigure::error,this,&MainWindow::onApplicationError);
+        // bind slots method to the related signal
+        connect(figure,&MarsFigure::error,this,&Mars::handleError);
         connect(ui->saveGraphAction,&QAction::triggered,figure,&MarsFigure::saveGraph);
     }
     figure->setHidden(false);
@@ -371,51 +365,54 @@ void MainWindow::renderFigureWindow()
 }
 
 
-
-
-
-void MainWindow::tickTask()
+void Mars::tickTask()
 {
+    /*
     static qint64 lastX=0;
     double x,y1,y2,y3,y4,y5,y6;
-    if(lastX>=10000)
+    return ;
+    if(lastX>=1000&&lastX<2000)
+    {
+        lastX++;
         return;
-     QByteArray bytes;
-      x = lastX;
-      y1 = qExp(-x/150.0)*qCos(x/10.0)*10;
-      y2 = qCos(x/10.0)*10;
-      y3 = qExp(-x/150.0)*10;
-      y4 = qSin(x/20.0)*10;
-      y5 = qSin(x/30.0)*10;
-      y6 = qCos(x/50.0)*10;
-      bytes.append(QString::number(y1)+' ');
-      bytes.append(QString::number(y2)+' ');
-      bytes.append(QString::number(y3)+' ');
-      bytes.append(QString::number(y4)+' ');
-      bytes.append(QString::number(y5)+' ');
-      bytes.append(QString::number(y6));
-      *(console->commandLine(0))<<bytes;
-    //qDebug()<<"x:"<<x<<"y1:"<<y1<<"y2:"<<y2;
-     //figure->plot(x,y1,0,0);
-     //figure->plot(x,y2,1,1);
-    //QByteArray data="1,2,3;1,3,4;1,3,4\n2,3,4;2,4,5;2,4,5\n3,4,5;3,5,6;3,4,5\n4,3,4;4,4,2;4,3,2";
-      //inStream<<12.3243;
-      //inStream<<21.32;
-      //QDataStream outStream(data);
-      //outStream>>y;
-      //qDebug()<<data;
-      //qDebug()<<"hello";
-      //qDebug()<<y;
-   // figure->plot(data);
+    }
+    QByteArray bytes;
+    x = lastX;
+    //y1 = qExp(-x/150.0)*qCos(x/10.0)*10;
+    y2 = qCos(x/10.0)*10;
+    y3 = qExp(-x/150.0)*10;
+    y4 = qSin(x/20.0)*10;
+    y5 = qSin(x/30.0)*10;
+    */
+    /*
+    y6 = qCos(x/50.0)*10;
+    bytes.append(QString::number(y1)+' ');
+    bytes.append(QString::number(y2)+' ');
+    bytes.append(QString::number(y3)+' ');
+    bytes.append(QString::number(y4)+' ');
+    bytes.append(QString::number(y5)+' ');
+    bytes.append(QString::number(y6));
+    *(console->commandLine(0))<<bytes;
+    */
+    /*
+    if(figure)
+    {
+        figure->plot(y2,0,0);
+        figure->plot(y3,0,1);
+        figure->plot(y4,1,0);
+        figure->plot(y5,0,3);
+    }
     lastX++;
-
+    */
 }
+
+
 /*
  *@Desc: update menu bar's action  and widget status when current window has changed
  *@Args: int winId(0 denotes console window ,1  denotes figure window)
  *@Returns: None
  */
-void MainWindow::updateMenuBar(int winId)
+void Mars::updateMenuBar(int winId)
 {
     switch(winId)
     {
@@ -450,12 +447,13 @@ void MainWindow::updateMenuBar(int winId)
     }
 }
 
+
 /*
  *@Desc: remove current window and hide current window
  *@Args: None
  *@Returns: None
  */
-void MainWindow::beforeSwitchWindow()
+void Mars::beforeSwitchWindow()
 {
 
     switch(currentWindowId)
@@ -483,7 +481,7 @@ void MainWindow::beforeSwitchWindow()
  *@Args: int windowId
  *@Returns: None
  */
-void MainWindow::switchWindow(int windowId)
+void Mars::switchWindow(int windowId)
 {
 
     beforeSwitchWindow();
@@ -508,6 +506,44 @@ void MainWindow::switchWindow(int windowId)
 }
 
 
+/*
+ *@Desc: error handler for all QWidget object
+ *@Args: waiting to define
+ *@Returns:None
+ */
+void Mars::handleError(MarsError  error)
+{
+    if(error.level==INFO)
+    {
+        QMessageBox::information(this, tr("information"),error.msg);
+    }
+    else if(error.level==DEBUG)
+    {
+
+    }
+    else if(error.level==WARNING)
+    {
+        QMessageBox msgBox(QMessageBox::Warning, tr("warning"),error.msg, 0, this);
+        msgBox.setDetailedText(error.msg);
+        msgBox.addButton(tr("&Continue"), QMessageBox::RejectRole);
+        if (msgBox.exec() == QMessageBox::RejectRole)
+             return;
+    }
+    else if(error.level==ERROR)
+    {
+        QErrorMessage errorMsg(this);
+        errorMsg.showMessage(error.msg);
+        errorMsg.exec();
+    }
+    else
+    {
+       QMessageBox::StandardButton reply;
+       reply = QMessageBox::critical(this, tr("critical"),
+             error.msg,QMessageBox::Abort | QMessageBox::Ignore);
+       if (reply == QMessageBox::Abort)
+           QApplication::instance()->quit();
+    }
+}
 
 
 

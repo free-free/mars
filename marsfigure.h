@@ -15,6 +15,7 @@ class QColor;
 class QComboBox;
 class QVBoxLayout;
 class MarsPlot;
+class QCPGraph;
 
 class MarsFigure : public QWidget
 {
@@ -41,8 +42,6 @@ public slots:
 
     void readTextFile(QFile * file);
     void writeTextFile(QFile *file);
-    void readXMLFile(QFile * file);
-    void writeXMLFile(QFile * file);
     void readJSONFile(QFile * file);
     void writeJSONFile(QFile* file);
     void readDatFile(QFile * file);
@@ -61,6 +60,7 @@ public slots:
     void onPlotActionTriggered();
     void changeCurrentPloter(int index);
     MarsPlot* createPloter();
+    int createGraph(int plotId);
     void deletePloter();
 
 private:

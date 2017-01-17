@@ -160,6 +160,7 @@ MarsPlot * MarsFigure::createPloter()
     tmpPloter->xAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
     tmpPloter->legend->setVisible(true);
     tmpPloter->legend->setSelectableParts(QCPLegend::spItems);
+    tmpPloter->setBackground(QBrush(QColor(247,247,247)));
     ploterContainer->append(tmpPloter);
     currentPloter = tmpPloter;
     arrangePloter();
@@ -167,6 +168,20 @@ MarsPlot * MarsFigure::createPloter()
     return tmpPloter;
 }
 
+/**
+ *@Desc: create graph
+ *@Args: int plotId
+ *@Returns: int graphId
+ */
+int MarsFigure::createGraph(int plotId)
+{
+    int graphId;
+    ploterContainer->at(plotId)->addGraph();
+    // recorrect graphId after creating new graph in the current ploter
+    graphId = ploterContainer->at(plotId)->graphCount()-1;
+    ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId), 1));
+    return graphId;
+}
 /**
  *@Desc: delete selected ploter
  *@Args: None
@@ -409,7 +424,6 @@ void MarsFigure::plot(QString &data)
             y.at(j)->append(dataLineItems.at(j+1).toDouble());
         }
     }
-
     int graphId = 0;
     int plotId = 0;
     for(int i = 0; i < dataGraphNum; i++)
@@ -418,7 +432,6 @@ void MarsFigure::plot(QString &data)
         graphId = i%MAX_GRAPH_NUMBER;
         plot(x, *y.at(i), graphId , plotId);
         delete y.at(i);
-
     }
 
 }
@@ -451,11 +464,12 @@ void MarsFigure::plot(double x, double y, int graphId,int plotId)
     }
     if((graphId+1)>ploterContainer->at(plotId)->graphCount())
     {
+        /*
         ploterContainer->at(plotId)->addGraph();
-        // recorrect graphId after creating new graph in the current ploter
         graphId = ploterContainer->at(plotId)->graphCount()-1;
-        ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId)));
-
+        ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId),1.5));
+        */
+        graphId = createGraph(plotId);
     }
     ploterContainer->at(plotId)->graph(graphId)->addData(x,y);
     double xRange = ploterContainer->at(plotId)->xMaxRange();
@@ -483,13 +497,16 @@ void MarsFigure::plot(double y , int graphId, int plotId)
 
     if((graphId+1)>ploterContainer->at(plotId)->graphCount())
     {
+        /*
         ploterContainer->at(plotId)->addGraph();
         // recorrect graphId after creating new graph in the current ploter
         graphId = ploterContainer->at(plotId)->graphCount()-1;
-        ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId)));
+        ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId), 1.5));
+        */
+         graphId = createGraph(plotId);
     }
 
-    if(ploterContainer->at(plotId)->graph(graphId)>0)
+    if(ploterContainer->at(plotId)->graph(graphId)!=0)
     {
         int dataCount = ploterContainer->at(plotId)->graph(graphId)->dataCount();
         if(dataCount > 0 )
@@ -537,14 +554,16 @@ void MarsFigure::plot(QVector<double> &x, QVector<double> &y, int graphId,int pl
     }
     if((graphId+1)>ploterContainer->at(plotId)->graphCount())
     {
+        /*
         ploterContainer->at(plotId)->addGraph();
         // recorrent graphId after create new graph in the current ploter
         graphId = ploterContainer->at(plotId)->graphCount()-1;
-        ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId)));
+        ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId), 1.5));
         ploterContainer->at(plotId)->graph(graphId)->rescaleAxes(false);
+        */
+        graphId = createGraph(plotId);
     }
     ploterContainer->at(plotId)->graph(graphId)->setData(x,y); // 65-67 ms /per hundred thousand data
-  //  ploterContainer->at(plotId)->xAxis->setRange(x.last()-10,100,Qt::AlignRight);
     ploterContainer->at(plotId)->replot();
 }
 
@@ -566,8 +585,9 @@ void MarsFigure::plot(QVector<double> &x, QVector<double> &y, int graphId)
         currentPloter->addGraph();
         // recorrent graphId after create new graph in the current ploter
         graphId = currentPloter->graphCount()-1;
-        currentPloter->graph(graphId)->setPen(QPen(graphColor(graphId)));
+        currentPloter->graph(graphId)->setPen(QPen(graphColor(graphId), 1.5));
         currentPloter->graph(graphId)->rescaleAxes(false);
+
     }
     currentPloter->graph(graphId)->setData(x,y); // 65-67 ms /per hundred thousand data
    // currentPloter->xAxis->setRange(x.last()-10,100,Qt::AlignRight);
@@ -638,7 +658,7 @@ void MarsFigure::saveGraph()
 void MarsFigure::showExportDataDialog()
 {
     QString fileName = QFileDialog::getSaveFileName(this,tr("导出数据"),QString(),
-                                                    tr("*.txt files(*.txt);;*.json files(*.json);;*.dat files(*.dat);; *.xml files(*.xml)"));
+                                                    tr("*.txt files(*.txt);;*.json files(*.json);;*.dat files(*.dat);;"));
     if(fileName.isEmpty())
     {
         emit error(errorInstance(tr("文件名不能为空"),WARNING));
@@ -675,10 +695,6 @@ void MarsFigure::writeFile(const QString &fileName)
         {
             writeDatFile(&file);
         }
-        else if(fileType == "xml")
-        {
-            writeXMLFile(&file);
-        }
         else
         {
             writeTextFile(&file);
@@ -699,7 +715,7 @@ void MarsFigure::writeFile(const QString &fileName)
 void MarsFigure::showImportDataDialog()
 {
     QString fileName = QFileDialog::getOpenFileName(this,tr("导入文件"),QString(),
-                                     tr("*.txt files(*.txt);;*.json files(*.json);;*.dat files(*.dat);; *.xml files(*.xml)"));
+                                     tr("*.txt files(*.txt);;*.json files(*.json);;*.dat files(*.dat);;"));
     if(fileName.isEmpty())
     {
         emit error(errorInstance(tr("文件名不能为空"),WARNING));
@@ -741,10 +757,6 @@ void MarsFigure::readFile(const QString &fileName)
         else if(fileType == "dat")
         {
             readDatFile(&file);
-        }
-        else if(fileType == "xml")
-        {
-            readXMLFile(&file);
         }
         else
         {
@@ -966,34 +978,6 @@ void MarsFigure::writeDatFile(QFile * file)
     QJsonDocument saveDocument(data);
     file->write(saveDocument.toBinaryData());
 }
-/**
- *@Desc: reading xml file and draw data's graph
- *@Args: QFile * file
- *@Returns: None
- */
-void MarsFigure::readXMLFile(QFile * file)
-{
-    Q_UNUSED(file);
-    /*
-     *
-     * reading data from xml file.
-     * I not decide to implement it at this time,so just let it fuck here ,byebye
-     */
-}
-/**
- *@Desc: writting graph's data to xml file
- *@Args: QFile *file
- *@Returns: None
- */
-void MarsFigure::writeXMLFile(QFile * file)
-{
-    Q_UNUSED(file);
-    /*
-     * writing data into xml file.
-     * I also not decide to implement it at this time, it fucks me all the time, son of bitch
-     */
-}
-
 
 void MarsFigure::changeCurrentPloterOnFocusIn(MarsPlot *focusInObj)
 {

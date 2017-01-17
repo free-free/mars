@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>Mars</class>
+ <widget class="QMainWindow" name="Mars">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,27 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Mars</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="mars_resource.qrc">
+    <normaloff>:/icon/mars</normaloff>
+    <disabledoff>:/icon/mars</disabledoff>:/icon/mars</iconset>
+  </property>
+  <property name="toolTip">
+   <string/>
+  </property>
+  <property name="statusTip">
+   <string/>
+  </property>
+  <property name="whatsThis">
+   <string/>
+  </property>
+  <property name="accessibleName">
+   <string/>
+  </property>
+  <property name="accessibleDescription">
+   <string/>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -475,11 +495,6 @@ QMenu::item::pressed{
    <addaction name="configurationsMenu"/>
    <addaction name="helpMenu"/>
   </widget>
-  <action name="action">
-   <property name="text">
-    <string>关于串口</string>
-   </property>
-  </action>
   <action name="connectSPAction">
    <property name="icon">
     <iconset resource="mars_resource.qrc">

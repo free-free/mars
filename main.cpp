@@ -1,10 +1,10 @@
-#include "mainwindow.h"
+#include "mars.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
+    Mars w;
     w.show();
 
     return a.exec();

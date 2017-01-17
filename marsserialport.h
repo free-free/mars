@@ -7,6 +7,7 @@
 
 class QSerialPort;
 class QFile;
+class MarsBytesQueue;
 
 class MarsSerialPort : public QSerialPort
 {
@@ -25,26 +26,36 @@ signals:
     void connected();
 
     void errors(MarsError  error);
+    // signal for serial port recevied one data frame
+    void dataFrameReceived();
 
 
 public slots:
-    // connect to MainWindow conectSPAction's triggered signal
+    // connect to serial port
     void connect();
-    // connect to MainWindow disconnectSPACtion's triggered signal
+    void connect(SerialPortSettings stts);
+    // diconnect serial port
     void disconnect();
-    // send data
-    int recvRawData(QByteArray &data);
+
     // send raw hex data
     void sendByteData(QByteArray data);
     // send file data
     void sendFileData(QFile &file);
     // update serial port settings
     void updateSettings(SerialPortSettings settings);
+    // read data frame from frame buffer queue
+    void readDataFrame(QByteArray &data);
+
 private:
     void handleError(QSerialPort::SerialPortError error);
+    // decapsulate data, add decapsulated data to buffer
+    void decapsulate();
 private:
 
     SerialPortSettings  settings;
+    QByteArray readingDataFrame;
+    MarsBytesQueue * dataFrames;
+
 };
 
 #endif // MarsSerialPort_H

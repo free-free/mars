@@ -357,6 +357,12 @@ void MarsCommandLine::enableViewOnly(bool ro)
     style()->prompt("");
 }
 
+
+/*
+ *@Desc: catch keyboard pressed key and append key value to buffer
+ *@Args: QKeyEvent * e
+ *@Returns: None
+ */
 void MarsCommandLine::keyPressEvent(QKeyEvent *e)
 {
 
@@ -424,33 +430,78 @@ void MarsCommandLine::keyPressEvent(QKeyEvent *e)
 
 }
 
+
+/*
+ *@Desc: catch mouse event,
+ *@Args: QMouseEvent * e
+ *@Returns: None
+ */
 void MarsCommandLine::mousePressEvent(QMouseEvent *e)
 {
-   // Q_UNUSED(e);
     /* i have a little sad */
-    //setFocus();
-    if(e->button()==Qt::RightButton)
+    setFocus();
+    if(isReadOnly())
     {
-        QPlainTextEdit::mousePressEvent(e);
+        /*
+         * when marscommandline is readonly,
+         * just catch mouse right button pressed event and delivery to parent class
+         *
+         */
+        if(e->button()==Qt::RightButton)
+        {
+            QPlainTextEdit::mousePressEvent(e);
+        }
+        else
+        {
+            Q_UNUSED(e);
+        }
     }
     else
     {
-        Q_UNUSED(e);
+        QPlainTextEdit::mousePressEvent(e);
     }
-
 }
 
+
+/*
+ *@Desc: mouse double click event
+ *@Args: QMouseEvent * e
+ *@Returns: None
+ */
 void MarsCommandLine::mouseDoubleClickEvent(QMouseEvent *e)
 {
     /* same ,Again!!!!!!!!!!*/
-    QPlainTextEdit::mouseDoubleClickEvent(e);
+    if(isReadOnly())
+    {
+        /*
+         * when marscommandline is readonly,
+         * just catch mouse double click event and delivery to parent class
+         *
+         */
+        if(e->button()==Qt::RightButton)
+        {
+            QPlainTextEdit::mousePressEvent(e);
+        }
+        else
+        {
+            Q_UNUSED(e);
+        }
+    }
+    else
+    {
+        QPlainTextEdit::mousePressEvent(e);
+    }
 }
 
+
+/*
+ *@Desc: context menu event , no implementation at this time
+ *@Args: QContextMenuEvent * e
+ *@Returns: None
+ */
 void MarsCommandLine::contextMenuEvent(QContextMenuEvent *e)
 {
-
-    /* hey ,boy */
-    /* do what you can */
+    /*  no implementation */
     Q_UNUSED(e);
 }
 
@@ -570,6 +621,12 @@ MarsError MarsCommandLine::errorInstance(QString msg, MarsErrorLevel level)
     return error;
 }
 
+
+/*
+ *@Desc: emit focusIn signal
+ *@Args: QFocusEvent * event
+ *@Returns: None
+ */
 void MarsCommandLine::focusInEvent(QFocusEvent *event)
 {
 
@@ -579,18 +636,26 @@ void MarsCommandLine::focusInEvent(QFocusEvent *event)
     }
 }
 
+
+/*
+ *@Desc: no implementation at this time
+ *@Args: QFocusEvent * e
+ *@Returns: None
+ */
 void MarsCommandLine::focusOutEvent(QFocusEvent *event)
 {
     /*
      * nothing here
      */
+    Q_UNUSED(event);
 }
+
+
 /* **********************************************************************
  *
  * ----------MarsCommandLine::Style class implementation--------------------------
  * --
  */
-
 MarsCommandLine::Style::Style(MarsCommandLine * par)
 {
     parent = par;
@@ -610,6 +675,7 @@ MarsCommandLine::Style::Style(MarsCommandLine * par)
     parent->setCursorWidth(cursorWid);
 }
 
+
 /**
  *@Desc: return prompt string
  *@Args: None
@@ -621,6 +687,7 @@ QString MarsCommandLine::Style::prompt() const
     return promptString;
 }
 
+
 /**
  *@Desc: set prompt string
  *@Args: String
@@ -631,6 +698,7 @@ void MarsCommandLine::Style::prompt(QString ps)
     promptString = ps;
     promptStringLength = promptString.length();
 }
+
 
 /**
  *@Desc: set command line text color
@@ -646,6 +714,7 @@ void MarsCommandLine::Style::textColor(QColor color)
     p.setColor(QPalette::Base,bgColor);
     parent->setPalette(p);
 }
+
 
 /**
  *@Desc: return command line text color
@@ -685,30 +754,58 @@ QColor MarsCommandLine::Style::baseColor() const
     return bgColor;
 }
 
+
+/*
+ *@Desc: set command line's cursor width
+ *@Args: int width
+ *@Returns: None
+ */
 void MarsCommandLine::Style::cursorWidth(int w)
 {
     cursorWid = w;
     parent->setCursorWidth(cursorWid);
 }
 
+
+/*
+ *@Desc: return command line's cursor width
+ *@Args: None
+ *@Returns: int
+ */
 int MarsCommandLine::Style::cursorWidth() const
 {
     return cursorWid;
 }
 
 
+/*
+ *@Desc: return command line's prompt string length
+ *@Args: None
+ *@Returns: int
+ */
 int MarsCommandLine::Style::promptLength() const
 {
     return promptStringLength;
 }
 
 
+/*
+ *@Desc: set stylesheet for command line
+ *@Args: const QString & stylesheet
+ *@Returns: None
+ */
 void MarsCommandLine::Style::setStyleSheet(const QString &sh)
 {
     styleSheet = sh;
     parent->setStyleSheet(styleSheet);
 }
 
+
+/*
+ *@Desc: add stylesheet for command line
+ *@Args: const QSting & stylesheet
+ *@Returns: None
+ */
 void MarsCommandLine::Style::addStyleSheet(const QString &sh)
 {
     styleSheet +=sh;
@@ -716,6 +813,11 @@ void MarsCommandLine::Style::addStyleSheet(const QString &sh)
 }
 
 
+/*
+ *@Desc: return command line's style container
+ *@Args: None
+ *@Returns: MarsCommandLine::Style *
+ */
 MarsCommandLine::Style * MarsCommandLine::style()
 {
     return cmdStyle;

@@ -180,6 +180,7 @@ int MarsFigure::createGraph(int plotId)
     // recorrect graphId after creating new graph in the current ploter
     graphId = ploterContainer->at(plotId)->graphCount()-1;
     ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId), 1));
+    ploterContainer->at(plotId)->rescaleAxes();
     return graphId;
 }
 /**
@@ -473,9 +474,10 @@ void MarsFigure::plot(double x, double y, int graphId,int plotId)
     }
     ploterContainer->at(plotId)->graph(graphId)->addData(x,y);
     double xRange = ploterContainer->at(plotId)->xMaxRange();
-    double yRange = ploterContainer->at(plotId)->yMaxRange();
+    //double yRange = ploterContainer->at(plotId)->yMaxRange();
     ploterContainer->at(plotId)->xAxis->setRange(x+xRange/8, xRange, Qt::AlignRight);
-    ploterContainer->at(plotId)->yAxis->setRange(-yRange, yRange);
+    //ploterContainer->at(plotId)->yAxis->setRange(-yRange, yRange);
+    //ploterContainer->at(plotId)->yAxis->setRange();
     ploterContainer->at(plotId)->replot();
 }
 
@@ -494,18 +496,10 @@ void MarsFigure::plot(double y , int graphId, int plotId)
         // recorrect plotId after creating new ploter
         plotId = ploterContainer->length()-1;
     }
-
     if((graphId+1)>ploterContainer->at(plotId)->graphCount())
     {
-        /*
-        ploterContainer->at(plotId)->addGraph();
-        // recorrect graphId after creating new graph in the current ploter
-        graphId = ploterContainer->at(plotId)->graphCount()-1;
-        ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId), 1.5));
-        */
          graphId = createGraph(plotId);
     }
-
     if(ploterContainer->at(plotId)->graph(graphId)!=0)
     {
         int dataCount = ploterContainer->at(plotId)->graph(graphId)->dataCount();
@@ -518,9 +512,9 @@ void MarsFigure::plot(double y , int graphId, int plotId)
         x = 0.0;
     ploterContainer->at(plotId)->graph(graphId)->addData(x,y);
     double xRange = ploterContainer->at(plotId)->xMaxRange();
-    double yRange = ploterContainer->at(plotId)->yMaxRange();
+    //double yRange = ploterContainer->at(plotId)->yMaxRange();
     ploterContainer->at(plotId)->xAxis->setRange(x+xRange/8, xRange, Qt::AlignRight);
-    ploterContainer->at(plotId)->yAxis->setRange(-yRange, yRange);
+   // ploterContainer->at(plotId)->yAxis->setRange(-yRange, yRange);
     ploterContainer->at(plotId)->replot();
 }
 
@@ -554,13 +548,6 @@ void MarsFigure::plot(QVector<double> &x, QVector<double> &y, int graphId,int pl
     }
     if((graphId+1)>ploterContainer->at(plotId)->graphCount())
     {
-        /*
-        ploterContainer->at(plotId)->addGraph();
-        // recorrent graphId after create new graph in the current ploter
-        graphId = ploterContainer->at(plotId)->graphCount()-1;
-        ploterContainer->at(plotId)->graph(graphId)->setPen(QPen(graphColor(graphId), 1.5));
-        ploterContainer->at(plotId)->graph(graphId)->rescaleAxes(false);
-        */
         graphId = createGraph(plotId);
     }
     ploterContainer->at(plotId)->graph(graphId)->setData(x,y); // 65-67 ms /per hundred thousand data

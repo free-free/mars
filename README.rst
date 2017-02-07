@@ -40,6 +40,7 @@ building a windows executable using mxe on a linux system
 ++++++++++++++++++
 
 .. code-block:: bash
+
     $ git clone https://github.com/mxe/mxe.git
 
 
@@ -53,6 +54,7 @@ building a windows executable using mxe on a linux system
 +++++++++++++++++++++++++++++++
 
 .. code-block:: bash
+
     $ cd mxe && make qtbase qtserialport    
 
 
@@ -60,6 +62,7 @@ building a windows executable using mxe on a linux system
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 .. code-block:: bash
+
     $ <your mxe root directory>/usr/bin/i686-w64-mingw32.static-qmake-qt5
 
 
@@ -67,6 +70,7 @@ building a windows executable using mxe on a linux system
 +++++++++++++++++++++++++++++
 
 .. code-block:: bash
+
     $ make
 
 

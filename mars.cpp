@@ -372,48 +372,6 @@ void Mars::renderFigureWindow()
 }
 
 
-void Mars::tickTask()
-{
-    /*
-    static qint64 lastX=0;
-    double x,y1,y2,y3,y4,y5,y6;
-    return ;
-    if(lastX>=1000&&lastX<2000)
-    {
-        lastX++;
-        return;
-    }
-    QByteArray bytes;
-    x = lastX;
-    //y1 = qExp(-x/150.0)*qCos(x/10.0)*10;
-    y2 = qCos(x/10.0)*10;
-    y3 = qExp(-x/150.0)*10;
-    y4 = qSin(x/20.0)*10;
-    y5 = qSin(x/30.0)*10;
-    */
-    /*
-    y6 = qCos(x/50.0)*10;
-    bytes.append(QString::number(y1)+' ');
-    bytes.append(QString::number(y2)+' ');
-    bytes.append(QString::number(y3)+' ');
-    bytes.append(QString::number(y4)+' ');
-    bytes.append(QString::number(y5)+' ');
-    bytes.append(QString::number(y6));
-    *(console->commandLine(0))<<bytes;
-    */
-    /*
-    if(figure)
-    {
-        figure->plot(y2,0,0);
-        figure->plot(y3,0,1);
-        figure->plot(y4,1,0);
-        figure->plot(y5,0,3);
-    }
-    lastX++;
-    */
-}
-
-
 /*
  *@Desc: update menu bar's action  and widget status when current window has changed
  *@Args: int winId(0 denotes console window ,1  denotes figure window)

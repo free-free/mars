@@ -1,3 +1,14 @@
+/************************************************************************
+ * CopyRights (C): Thogo tech all rights reserved!
+ *
+ *@file: marsconsole.cpp
+ *@description: this file contains the implementation of console class
+ *@version: 0.1
+ *@author: jell
+ *@date: 2017/02/07
+ *
+ *
+ */
 #include "marsconsole.h"
 #include "marscommandline.h"
 #include "marsbyteslistbuffer.h"

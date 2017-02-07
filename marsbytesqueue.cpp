@@ -1,3 +1,14 @@
+/************************************************************************
+ * CopyRights (C): Thogo tech all rights reserved!
+ *
+ *@file: marsbytequeue.cpp
+ *@description: this file contains bytes queue data structure implementation
+ *@version: 0.1
+ *@author: jell
+ *@date: 2017/02/07
+ *
+ *
+ */
 #include "marsbytesqueue.h"
 
 #include <QDebug>

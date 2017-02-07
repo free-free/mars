@@ -1,16 +1,28 @@
+/************************************************************************
+ * CopyRights (C): Thogo tech all rights reserved!
+ *
+ *@file: marsplot.cpp
+ *@description: this file contains implementation of plot class
+ *@version: 0.1
+ *@author: jell
+ *@date: 2017/01/12
+ *
+ *
+ */
+
 #include "marsplot.h"
 #include "qcustomplot.h"
 #include <QWheelEvent>
 #include <QDebug>
 
+
 /**
- *@Desc: do no thing here
+ *@Desc: ***
  *@Args: None
  *@Returns: None
  */
 MarsPlot::MarsPlot(QWidget * parent):QCustomPlot(parent)
 {
-    /* hi,buddy you can fuck here */
     titleText = "Graph Title";
     QCPTextElement *title = new QCPTextElement(this, titleText,
           QFont("sans",14));
@@ -39,6 +51,7 @@ MarsPlot::~MarsPlot()
 {
     /* hi,buddy you can fuck here */
 }
+
 
 /**
  *@Desc: override QCustomPlot's wheelEvent to handle xAxis zooming and yAxis zooming seperately
@@ -87,6 +100,7 @@ void MarsPlot::wheelEvent(QWheelEvent *event)
 
 }
 
+
 void MarsPlot::focusInEvent(QFocusEvent *event)
 {
     if(event->gotFocus())
@@ -94,6 +108,7 @@ void MarsPlot::focusInEvent(QFocusEvent *event)
         emit focusIn(this);
     }
 }
+
 
 /**
  *@Desc: change title text of plotting
@@ -117,6 +132,8 @@ void MarsPlot::changeTitle(QMouseEvent * event)
         }
     }
 }
+
+
 /**
  *@Desc: change legend name of graph when doudle clicked on legend item
  *@Args: QCPLegend * legend,QCPAbstractLegendItem * item
@@ -139,6 +156,7 @@ void MarsPlot::changeGraphLegendName(QCPLegend *legend, QCPAbstractLegendItem *i
        }
      }
 }
+
 
 /**
  *@Desc: change axis label name when double click on axis
@@ -187,6 +205,7 @@ void MarsPlot::onMouseMove(QMouseEvent * event)
 
 }
 
+
 /*
  *@Desc: return x axis max range value
  *@Args: None
@@ -196,6 +215,7 @@ double MarsPlot::xMaxRange() const
 {
     return xMaxRangeValue ;
 }
+
 
 /*
  *@Desc: return y axis max range value

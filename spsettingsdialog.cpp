@@ -1,3 +1,14 @@
+/************************************************************************
+ * CopyRights (C): Thogo tech all rights reserved!
+ *
+ *@file: spsettingsdialog.cpp
+ *@description: this file contains the implementation of serial port config window class
+ *@version: 0.1
+ *@author: jell
+ *@date: 2017/02/07
+ *
+ *
+ */
 #include "spsettingsdialog.h"
 #include "ui_spsettingsdialog.h"
 
@@ -33,6 +44,7 @@ SPSettingsDialog::SPSettingsDialog(QWidget *parent) :
     storeSettings();
 }
 
+
 SPSettingsDialog::~SPSettingsDialog()
 {
     delete ui;
@@ -59,6 +71,7 @@ void SPSettingsDialog::applySerialPortConfig()
     emit updated(currentSettings);
     hide();
 }
+
 
 void SPSettingsDialog::checkCustomBaudRatePolicy(int index)
 {
@@ -124,7 +137,6 @@ void SPSettingsDialog::fillSerialPortParameters()
 }
 
 
-
 void SPSettingsDialog::fillSerialPortInfo()
 {
     ui->serialPortInfoListBox->clear();
@@ -184,6 +196,7 @@ void SPSettingsDialog::storeSettings()
 
 }
 
+
 SerialPortSettings SPSettingsDialog::settings() const
 {
     return currentSettings;
@@ -196,21 +209,3 @@ int SPSettingsDialog::exec()
     storeSettings();
     return QDialog::exec();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

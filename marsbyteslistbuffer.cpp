@@ -1,3 +1,14 @@
+/************************************************************************
+ * CopyRights (C): Thogo tech all rights reserved!
+ *
+ *@file: marsbyteslistbuffer.cpp
+ *@description: this file contains the sized byte list buffer stucture imlementation
+ *@version: 0.1
+ *@author: jell
+ *@date: 2017/02/07
+ *
+ *
+ */
 #include "marsbyteslistbuffer.h"
 #include <QTextStream>
 #include <QDebug>

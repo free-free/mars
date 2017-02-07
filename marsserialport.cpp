@@ -1,10 +1,20 @@
-#include "marsserialport.h"
+/************************************************************************
+ * CopyRights (C): Thogo tech all rights reserved!
+ *
+ *@file: marsserialport.cpp
+ *@description: this file contains the implementation of mars serial port class
+ *@version: 0.1
+ *@author: jell
+ *@date: 2017/02/07
+ *
+ *
+ */
 
+#include "marsserialport.h"
 #include <QSerialPort>
 #include <QFile>
 #include <QDebug>
 #include <QTimer>
-
 #include "marsbytesqueue.h"
 
 
@@ -18,10 +28,12 @@ MarsSerialPort::MarsSerialPort(SerialPortSettings  stts,QObject *parent) : QSeri
                          this, &MarsSerialPort::decapsulate);
 }
 
+
 MarsSerialPort::~MarsSerialPort()
 {
 
 }
+
 
 /*
  *@Desc: connect to serial port
@@ -33,6 +45,8 @@ void MarsSerialPort::connect(SerialPortSettings stts)
     updateSettings(stts);
     connect();
 }
+
+
 /*
  *@Desc:connect to serial port
  *@Args:None
@@ -56,6 +70,8 @@ void MarsSerialPort::connect()
    }
    emit connected();
 }
+
+
 /*
  *@Desc:close serial porta
  *@Args:None
@@ -143,6 +159,7 @@ void MarsSerialPort::decapsulate()
     }
 }
 
+
 /*
  *@Desc: reading data frame from frame queue
  *@Args: QByetArray & data
@@ -154,17 +171,19 @@ void MarsSerialPort::readDataFrame(QByteArray &data)
     data = dataFrames->dequeue();
     qDebug()<<dataFrames->size();
 }
+
+
 /*
  *@Desc: update serial port settings
  *@Args: SerialPortSettings
  *@Returns:None
  *
  */
-
 void MarsSerialPort::updateSettings(SerialPortSettings settings)
 {
     this->settings = settings;
 }
+
 
 /**
  *@Desc: return error instance
@@ -181,12 +200,12 @@ MarsError MarsSerialPort::errorInstance(QString msg, MarsErrorLevel level)
     return error;
 }
 
+
 /**
  *@Desc: handle error serial port
  *@Args: SerialPort::SerialPortError error
  *@Returns: None
  */
-
 void MarsSerialPort::handleError(QSerialPort::SerialPortError error)
 {
     switch(error)
@@ -227,4 +246,3 @@ void MarsSerialPort::handleError(QSerialPort::SerialPortError error)
             break;
     }
 }
-

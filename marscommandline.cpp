@@ -1,3 +1,14 @@
+/************************************************************************
+ * CopyRights (C): Thogo tech all rights reserved!
+ *
+ *@file: marscommandline.cpp
+ *@description: this file contains the implementation of command line class
+ *@version: 0.1
+ *@author: jell
+ *@date: 2017/02/07
+ *
+ *
+ */
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QContextMenuEvent>
@@ -822,11 +833,3 @@ MarsCommandLine::Style * MarsCommandLine::style()
 {
     return cmdStyle;
 }
-
-
-
-
-
-
-
-

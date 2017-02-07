@@ -1,3 +1,16 @@
+/************************************************************************
+ * CopyRights (C): Thogo tech all rights reserved!
+ *
+ *@file: mars.cpp
+ *@description: this file contains the Mars class definition
+ *@version: 0.1
+ *@author: jell
+ *@date: 2017/02/07
+ *
+ *
+ */
+
+
 #include "mars.h"
 #include "ui_mars.h"
 #include "spsettingsdialog.h"
@@ -281,14 +294,11 @@ void Mars::plotConsoleData(MarsCommandLine *requestedObj)
     /* calculate graph number */
     int dataGraphNum = requestedObj->outputBuffer()->at(0).split(' ').length();
     /* create container for y axis value  */
-
     for(int i =0;i<dataGraphNum;i++)
     {
         y.append(new QVector<double>());
     }
-
     /* parse data from console's command line data */
-
     for(int i = 0;i<dataSize;i++)
     {
         x.append(i);
@@ -300,7 +310,6 @@ void Mars::plotConsoleData(MarsCommandLine *requestedObj)
     }
     int graphId = 0;
     int plotId = 0;
-
     /* starting plot */
     figure->startPlot();
     for(int i=0;i<dataGraphNum;i++)
@@ -350,7 +359,6 @@ void Mars::renderConsoleWindow()
  */
 void Mars::renderFigureWindow()
 {
-
     if(!figure)
     {
         // create MarsFigure instance
@@ -361,7 +369,6 @@ void Mars::renderFigureWindow()
     }
     figure->setHidden(false);
     mainWidgetLayout->addWidget(figure,1,1);
-
 }
 
 
@@ -544,6 +551,3 @@ void Mars::handleError(MarsError  error)
            QApplication::instance()->quit();
     }
 }
-
-
-

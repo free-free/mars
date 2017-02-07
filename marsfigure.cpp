@@ -1,3 +1,14 @@
+/************************************************************************
+ * CopyRights (C): Thogo tech all rights reserved!
+ *
+ *@file: marfigure.cpp
+ *@description: this file contains the implementation of figure class
+ *@version: 0.1
+ *@author: jell
+ *@date: 2017/02/07
+ *
+ *
+ */
 #include "marsfigure.h"
 #include <QAction>
 #include <QGridLayout>
@@ -27,6 +38,7 @@ MarsFigure::MarsFigure(QWidget *parent) : QWidget(parent)
     connect(this,&MarsFigure::getExportFileName,this,&MarsFigure::writeFile);
 }
 
+
 MarsFigure::~MarsFigure()
 {
     delete exportDataAction;
@@ -41,6 +53,7 @@ MarsFigure::~MarsFigure()
     delete layout;
 }
 
+
 /**
  *@Desc: init tool bar
  *@Args: None
@@ -49,8 +62,6 @@ MarsFigure::~MarsFigure()
  */
 void MarsFigure::initToolBar()
 {
-
-
     toolBar = new QToolBar("hello",this);
     toolBar->setStyleSheet(
                            "margin:0px 0px 0px 0px;"
@@ -113,13 +124,13 @@ void MarsFigure::initToolBar()
     layout->addWidget(toolBar);
 }
 
+
 /**
  *@Desc: init plot
  *@Args: None
  *@Returns: None
  *
  */
-
 void MarsFigure::initPlot()
 {
     plotLayout = new QGridLayout();
@@ -128,6 +139,8 @@ void MarsFigure::initPlot()
     currentPloter = createPloter();
     plotState = false;
 }
+
+
 
 /**
  *@Desc: create ploter instance and config it ,finally append it to ploterContainter
@@ -168,6 +181,7 @@ MarsPlot * MarsFigure::createPloter()
     return tmpPloter;
 }
 
+
 /**
  *@Desc: create graph
  *@Args: int plotId
@@ -183,6 +197,8 @@ int MarsFigure::createGraph(int plotId)
     ploterContainer->at(plotId)->rescaleAxes();
     return graphId;
 }
+
+
 /**
  *@Desc: delete selected ploter
  *@Args: None
@@ -201,6 +217,8 @@ void MarsFigure::deletePloter()
 
 
 }
+
+
 /**
  *@Desc: update status bar actions when create ploter or delete ploter
  *@Args: None
@@ -228,6 +246,8 @@ void MarsFigure::updateStatusBar()
     connect(ploterNameListBox,SIGNAL(currentIndexChanged(int)),this,SLOT(changeCurrentPloter(int)));
 
 }
+
+
 /**
  *@Desc: arrange ploter in parent layout
  *@Args: None
@@ -259,6 +279,8 @@ void MarsFigure::arrangePloter()
             break;
     }
 }
+
+
 /**
  *@Desc: start plot(including set plot state to true ,call replot function  and emit plotStarted signal
  *@Args: None
@@ -276,17 +298,18 @@ void MarsFigure::startPlot()
     emit plotStarted();
 }
 
+
 /**
  *@Desc: stop plot(including set plot state to false  and emit plotStopped signal
  *@Args: None
  *@Returns: None
  */
-
 void MarsFigure::stopPlot()
 {
     plotState = false;
     emit plotStopped();
 }
+
 
 /**
  *@Desc: change plotAction's icon and text ,call stopPlot function
@@ -310,6 +333,7 @@ void MarsFigure::onPlotActionTriggered()
     }
 }
 
+
 /**
  *@Desc: change current Ploter
  *@Args: int (ploter index in ploterContainer)
@@ -319,6 +343,7 @@ void MarsFigure::changeCurrentPloter(int index)
 {
     currentPloter = ploterContainer->at(index);
 }
+
 
 /**
  *@Desc: clear plot
@@ -334,6 +359,7 @@ void MarsFigure::clearCurrentPlot()
     }
     currentPloter->replot();
 }
+
 
 /**
  *@Desc: generate graph color and return color
@@ -357,6 +383,7 @@ QColor MarsFigure::graphColor(int graphId)
     }
 }
 
+
 /**
  *@Desc: fuck you, another plotting method
  *@Args: QList<QByteArray> & data
@@ -367,6 +394,7 @@ void MarsFigure::plot(QList<QByteArray> & data)
     QString dataStr = data.join('\n');
     plot(dataStr);
 }
+
 
 /**
  *@Desc: fuck you , another plotting method
@@ -379,6 +407,7 @@ void MarsFigure::plot(QByteArray & data)
     QString dataStr = data;
     plot(dataStr);
 }
+
 
 /**
  *@Desc:
@@ -436,6 +465,8 @@ void MarsFigure::plot(QString &data)
     }
 
 }
+
+
 /**
  *@Desc:
  *  plot graph
@@ -473,6 +504,7 @@ void MarsFigure::plot(double x, double y, int graphId,int plotId)
     ploterContainer->at(plotId)->replot();
 }
 
+
 void MarsFigure::plot(double y , int graphId, int plotId)
 {
     double x;
@@ -507,6 +539,7 @@ void MarsFigure::plot(double y , int graphId, int plotId)
     ploterContainer->at(plotId)->xAxis->setRange(x+xRange/8, xRange, Qt::AlignRight);
     ploterContainer->at(plotId)->replot();
 }
+
 
 /**
  *@Desc:

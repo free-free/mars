@@ -34,7 +34,7 @@ build
 ----------
 
 building a windows executable using mxe on a linux system
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. get mxe 
 ++++++++++++++++++
@@ -42,10 +42,12 @@ building a windows executable using mxe on a linux system
 .. code-block:: bash
     $ git clone https://github.com/mxe/mxe.git
 
+
 2. install build dependencies
 +++++++++++++++++++++++++++++++++
 
 `dependencies <http://mxe.cc/#requirements>`_
+
 
 3. Build Qt 5 for windows
 +++++++++++++++++++++++++++++++
@@ -53,17 +55,20 @@ building a windows executable using mxe on a linux system
 .. code-block:: bash
     $ cd mxe && make qtbase qtserialport    
 
+
 4. Get to the directory of your app, and run the following command
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 .. code-block:: bash
     $ <your mxe root directory>/usr/bin/i686-w64-mingw32.static-qmake-qt5
 
+
 5. Build your project
 +++++++++++++++++++++++++++++
 
 .. code-block:: bash
     $ make
+
 
 6. get your windows executable in the sub directory 'Release' of your project directory
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

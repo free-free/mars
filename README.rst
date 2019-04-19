@@ -9,19 +9,19 @@ ui view
 comannd line window
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. image:: http://okzdacydq.bkt.clouddn.com/cmd.png
+.. image:: ./images/cmd.png
   :align: center
 
 graph window
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. image:: http://okzdacydq.bkt.clouddn.com/figure.png
+.. image:: ./images/figure.png
   :align: center
 
 serial port config window
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. image:: http://okzdacydq.bkt.clouddn.com/serialportconfig.png
+.. image:: ./images/serialportconfig.png
   :align: center
 
 requirements

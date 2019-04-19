@@ -1,11 +1,12 @@
 /************************************************************************
  * CopyRights (C): Thogo tech all rights reserved!
  *
- *@file: mars.cpp
- *@description: this file contains the Mars class definition
- *@version: 0.1
- *@author: jell
- *@date: 2017/02/07
+ * @file: mars.cpp
+ * @description: this file contains the Mars class definition
+ * @version: 0.1
+ * @author: infinit.ft
+ * @date: 2017/02/07
+ * @update_at: 2017/03/21
  *
  *
  */
@@ -214,7 +215,7 @@ void Mars::renderSerialPortData()
     {
         case 0:
             // parse serial port data and send data to console
-            for (int i = 0 ; i < 4; i++)
+            for (int i = 0 ; i < 5; i++)
             {
                 consoleStr.append(QString::number(bytesToFloat(data.mid(1+i*4 ,4))));
                 consoleStr.append(' ');
@@ -223,7 +224,7 @@ void Mars::renderSerialPortData()
             break;
         case 1:
             // parse serial port data and send data to figure
-            for (int i = 0 ; i < 4; i++)
+            for (int i = 0 ; i < 5; i++)
             {
                 if(data.mid(1+i*4, 4).toHex()==QByteArray(0x00000000))
                     break;
@@ -341,8 +342,8 @@ void Mars::renderConsoleWindow()
         tick = new QTimer(this);
         tick->setInterval(10);
         tick->start();
-        // bing slots method to the related signal
-        connect(tick,&QTimer::timeout,this,&Mars::tickTask);
+        // binding slots method to the related signal
+        //connect(tick,&QTimer::timeout,this,&Mars::tickTask);
         connect(console->commandLine(0),&MarsCommandLine::dataIn,this,&Mars::sendConsoleData);
         connect(console,&MarsConsole::errors,this,&Mars::handleError);
         connect(console,&MarsConsole::plotDataRequest,this,&Mars::plotConsoleData);

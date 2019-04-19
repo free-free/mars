@@ -16,6 +16,7 @@ class QComboBox;
 class QVBoxLayout;
 class MarsPlot;
 class QCPGraph;
+class QCPScatterStyle;
 
 class MarsFigure : public QWidget
 {
@@ -69,6 +70,7 @@ private:
     void initPlot();
     void arrangePloter();
     QColor graphColor(int graphId);
+    QCPScatterStyle graphScatterStyle(int graphId);
     void updateStatusBar();
     void readFile(const QString &fileName);
     void writeFile(const QString &fileName);
@@ -79,7 +81,7 @@ private:
 private:
     const int MAX_PLOTER_NUMBER = 4;
     const int MIN_PLOTER_NUMBER = 1;
-    const int MAX_GRAPH_NUMBER = 4;
+    const int MAX_GRAPH_NUMBER = 5;
     QVBoxLayout * layout;
     QGridLayout * plotLayout;
     QToolBar * toolBar;

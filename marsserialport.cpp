@@ -1,11 +1,12 @@
 /************************************************************************
  * CopyRights (C): Thogo tech all rights reserved!
  *
- *@file: marsserialport.cpp
- *@description: this file contains the implementation of mars serial port class
- *@version: 0.1
- *@author: jell
- *@date: 2017/02/07
+ * @file: marsserialport.cpp
+ * @description: this file contains the implementation of mars serial port class
+ * @version: 0.1
+ * @author: infinite.ft
+ * @date: 2017/02/07
+ * @update_at: 2017/03/21
  *
  *
  */
@@ -35,24 +36,30 @@ MarsSerialPort::~MarsSerialPort()
 }
 
 
-/*
- *@Desc: connect to serial port
- *@Args: SerialPortSettings
- *@Returns: None
+/**
+ *
+ * @brief: connect to serial port
+ * @param: SerialPortSettings
+ * @returns: None
+ *
  */
-void MarsSerialPort::connect(SerialPortSettings stts)
+void
+MarsSerialPort::connect(SerialPortSettings stts)
 {
     updateSettings(stts);
     connect();
 }
 
 
-/*
- *@Desc:connect to serial port
- *@Args:None
- *@Returns:None
+/**
+ *
+ * @brief: connect to serial port
+ * @param: None
+ * @returns: None
+ *
  */
-void MarsSerialPort::connect()
+void
+MarsSerialPort::connect()
 {
 
    setPortName(settings.name);
@@ -72,13 +79,15 @@ void MarsSerialPort::connect()
 }
 
 
-/*
- *@Desc:close serial porta
- *@Args:None
- *@Returns:
+/**
+ *
+ * @brief: close serial porta
+ * @param: None
+ * @returns:None
+ *
  */
-
-void MarsSerialPort::disconnect()
+void
+MarsSerialPort::disconnect()
 {
     /* implementation */
     if(isOpen())
@@ -91,61 +100,78 @@ void MarsSerialPort::disconnect()
 
 }
 
-/*
- *@Desc:send byte data
- *@Args:QByteArray
- *@Returns:None
+
+/**
+ *
+ * @brief: send byte data
+ * @param: data
+ * @returns: None
+ *
  */
-void MarsSerialPort::sendByteData(QByteArray data)
+void
+MarsSerialPort::sendByteData(QByteArray data)
 {
     /* waiting you to fuck me */
     Q_UNUSED(data);
 }
 
-/*
- *@Desc:send file data
- *@Args:QFile
- *@Returns:None
+
+/**
+ *
+ * @brief: send file data
+ * @param: file
+ * @returns: None
  *
  */
-void MarsSerialPort::sendFileData(QFile & file)
+void
+MarsSerialPort::sendFileData(QFile & file)
 {
     /*waiting you to fuck me */
     Q_UNUSED(file);
 }
 
-/*
- *@Desc: read data from serial port and decapsulate it ,finally add it to buffer
- *@Args: None
- *@Returns: None
+
+/**
+ *
+ * @brief: read data from serial port and decapsulate it ,finally add it to buffer
+ * @param: None
+ * @returns: None
  *
  */
-void MarsSerialPort::decapsulate()
+void
+MarsSerialPort::decapsulate()
 {
 
     QByteArray bytes;
-    static quint16 sum = 0;
     quint8 checkSum = 0;
+    int bytesLength = 0;
+    static quint16 sum = 0;
+
     bytes = readAll();
-    int bytesLength = bytes.length();
+    bytesLength = bytes.length();
     for( int i = 0 ; i < bytesLength; i++)
     {
-        switch((unsigned char)bytes.at(i))
+        switch((quint8)bytes.at(i))
         {
+                // start to receive data
             case 0x55:
                 readingDataFrame.clear();
                 sum = 0;
                 break;
             case 0xdd:
                 // check data length
-                if(readingDataFrame.length() != 18)
+                if(readingDataFrame.length() != 22)
+                {
                     break;
+                }
                 // check frame sum
-                checkSum = (unsigned char)readingDataFrame.at(17);
-                if(((sum-checkSum)%256) != checkSum)
+                checkSum = (quint8)readingDataFrame.at(21);
+                if(((sum- checkSum) % 256) != checkSum)
+                {
                     break;
+                }
                 // remove check sum from data
-                readingDataFrame.remove(17,1);
+                readingDataFrame.remove(21,1);
                 dataFrames->enqueue(readingDataFrame);
                 readingDataFrame.clear();
                 // emit dataFrameReceived signal
@@ -153,44 +179,51 @@ void MarsSerialPort::decapsulate()
                 break;
             default:
                 readingDataFrame.append(bytes.at(i));
-                sum += (unsigned char)bytes.at(i);
+                sum += (quint8)bytes.at(i);
                 break;
         }
     }
 }
 
 
-/*
- *@Desc: reading data frame from frame queue
- *@Args: QByetArray & data
- *@Returns: None
+/**
+ *
+ * @brief: reading data frame from frame queue
+ * @param: data
+ * @returns: None
  *
  */
-void MarsSerialPort::readDataFrame(QByteArray &data)
+void
+MarsSerialPort::readDataFrame(QByteArray &data)
 {
     data = dataFrames->dequeue();
-    qDebug()<<dataFrames->size();
 }
 
 
-/*
- *@Desc: update serial port settings
- *@Args: SerialPortSettings
- *@Returns:None
+/**
+ *
+ * @brief: update serial port settings
+ * @param: settings
+ * @returns:None
  *
  */
-void MarsSerialPort::updateSettings(SerialPortSettings settings)
+void
+MarsSerialPort::updateSettings(SerialPortSettings settings)
 {
     this->settings = settings;
 }
 
 
 /**
- *@Desc: return error instance
- *@Args:  QString ,MarsErrorLevel
- *@Returns: MarsError
+ *
+ * @brief: return error instance
+ * @param: msg, message string
+ * @param: level
+ * @returns: MarsError
+ *
  */
-MarsError MarsSerialPort::errorInstance(QString msg, MarsErrorLevel level)
+MarsError
+MarsSerialPort::errorInstance(QString msg, MarsErrorLevel level)
 {
     MarsError error;
     error.datetime = QDateTime::currentDateTime();
@@ -202,11 +235,14 @@ MarsError MarsSerialPort::errorInstance(QString msg, MarsErrorLevel level)
 
 
 /**
- *@Desc: handle error serial port
- *@Args: SerialPort::SerialPortError error
- *@Returns: None
+ *
+ * @brief: handle error serial port
+ * @param: error
+ * @returns: None
+ *
  */
-void MarsSerialPort::handleError(QSerialPort::SerialPortError error)
+void
+MarsSerialPort::handleError(QSerialPort::SerialPortError error)
 {
     switch(error)
     {
